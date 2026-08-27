@@ -69,7 +69,8 @@ router.post('/auth/login', (req, res) => {
     username: authenticatedUser.username,
     name: authenticatedUser.name,
     email: authenticatedUser.email,
-    role: authenticatedUser.role
+    role: authenticatedUser.role,
+    avatar: authenticatedUser.avatar || null
   };
   res.redirect(nextPath);
 });
@@ -93,48 +94,56 @@ router.get('/profile', (req, res) => {
 });
 
 router.post('/profile', (req, res) => {
-  const currentUser = req.session.user;
-  const user = userStore.find(currentUser.id);
-  if (!user) {
-    req.flash('message', { type: 'danger', text: 'Data profil pengguna tidak ditemukan.' });
-    return res.redirect('/');
-  }
+  upload.single('avatar')(req, res, (err) => {
+    if (uploadError(req, res, err, '/profile')) return;
 
-  const { name, email, oldPassword, newPassword, confirmPassword } = req.body;
+    const currentUser = req.session.user;
+    const user = userStore.find(currentUser.id);
+    if (!user) {
+      req.flash('message', { type: 'danger', text: 'Data profil pengguna tidak ditemukan.' });
+      return res.redirect('/');
+    }
 
-  if (newPassword && newPassword !== confirmPassword) {
-    return res.status(400).render('users/profile', {
-      title: 'Profil Saya',
-      user,
-      values: { ...user, name, email },
-      error: 'Konfirmasi password baru tidak cocok.'
-    });
-  }
+    const { name, email, oldPassword, newPassword, confirmPassword, removeAvatar } = req.body;
+    const avatar = req.file ? `/uploads/${req.file.filename}` : null;
 
-  try {
-    const updated = userStore.updateProfile(currentUser.id, {
-      name,
-      email,
-      oldPassword,
-      newPassword
-    });
+    if (newPassword && newPassword !== confirmPassword) {
+      return res.status(400).render('users/profile', {
+        title: 'Profil Saya',
+        user,
+        values: { ...user, name, email },
+        error: 'Konfirmasi password baru tidak cocok.'
+      });
+    }
 
-    req.session.user.name = updated.name;
-    req.session.user.email = updated.email;
+    try {
+      const updated = userStore.updateProfile(currentUser.id, {
+        name,
+        email,
+        oldPassword,
+        newPassword,
+        avatar,
+        removeAvatar
+      });
 
-    req.flash('message', {
-      type: 'success',
-      text: 'Profil dan password Anda berhasil diperbarui.'
-    });
-    res.redirect('/profile');
-  } catch (err) {
-    res.status(400).render('users/profile', {
-      title: 'Profil Saya',
-      user,
-      values: { ...user, name, email },
-      error: err.message
-    });
-  }
+      req.session.user.name = updated.name;
+      req.session.user.email = updated.email;
+      req.session.user.avatar = updated.avatar;
+
+      req.flash('message', {
+        type: 'success',
+        text: 'Profil dan foto akun Anda berhasil diperbarui.'
+      });
+      res.redirect('/profile');
+    } catch (err) {
+      res.status(400).render('users/profile', {
+        title: 'Profil Saya',
+        user,
+        values: { ...user, name, email },
+        error: err.message
+      });
+    }
+  });
 });
 
 // User Management Routes (Admin Only)
@@ -205,46 +214,52 @@ router.get('/users/:id/edit', requireAdmin, (req, res) => {
 });
 
 router.post('/users/:id/edit', requireAdmin, (req, res) => {
-  const targetUser = userStore.find(req.params.id);
-  if (!targetUser) {
-    req.flash('message', { type: 'danger', text: 'Pengguna tidak ditemukan.' });
-    return res.redirect('/users');
-  }
+  upload.single('avatar')(req, res, (err) => {
+    if (uploadError(req, res, err, `/users/${req.params.id}/edit`)) return;
 
-  const { name, email, role, password, confirmPassword } = req.body;
-
-  if (password && password !== confirmPassword) {
-    return res.status(400).render('users/edit', {
-      title: `Edit Pengguna: ${targetUser.username}`,
-      user: targetUser,
-      values: { ...targetUser, name, email, role },
-      error: 'Konfirmasi password baru tidak cocok.'
-    });
-  }
-
-  try {
-    const updated = userStore.update(req.params.id, { name, email, role, password }, req.session.user.id);
-    
-    // If the admin edited their own active account, update the session
-    if (req.session.user.id === updated.id) {
-      req.session.user.name = updated.name;
-      req.session.user.email = updated.email;
-      req.session.user.role = updated.role;
+    const targetUser = userStore.find(req.params.id);
+    if (!targetUser) {
+      req.flash('message', { type: 'danger', text: 'Pengguna tidak ditemukan.' });
+      return res.redirect('/users');
     }
 
-    req.flash('message', {
-      type: 'success',
-      text: `Data pengguna "${updated.username}" berhasil diperbarui.`
-    });
-    res.redirect('/users');
-  } catch (err) {
-    res.status(400).render('users/edit', {
-      title: `Edit Pengguna: ${targetUser.username}`,
-      user: targetUser,
-      values: { ...targetUser, name, email, role },
-      error: err.message
-    });
-  }
+    const { name, email, role, password, confirmPassword, removeAvatar } = req.body;
+    const avatar = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (password && password !== confirmPassword) {
+      return res.status(400).render('users/edit', {
+        title: `Edit Pengguna: ${targetUser.username}`,
+        user: targetUser,
+        values: { ...targetUser, name, email, role },
+        error: 'Konfirmasi password baru tidak cocok.'
+      });
+    }
+
+    try {
+      const updated = userStore.update(req.params.id, { name, email, role, password, avatar, removeAvatar }, req.session.user.id);
+      
+      // If the admin edited their own active account, update the session
+      if (req.session.user.id === updated.id) {
+        req.session.user.name = updated.name;
+        req.session.user.email = updated.email;
+        req.session.user.role = updated.role;
+        req.session.user.avatar = updated.avatar;
+      }
+
+      req.flash('message', {
+        type: 'success',
+        text: `Data pengguna "${updated.username}" berhasil diperbarui.`
+      });
+      res.redirect('/users');
+    } catch (err) {
+      res.status(400).render('users/edit', {
+        title: `Edit Pengguna: ${targetUser.username}`,
+        user: targetUser,
+        values: { ...targetUser, name, email, role },
+        error: err.message
+      });
+    }
+  });
 });
 
 router.post('/users/:id/delete', requireAdmin, (req, res) => {

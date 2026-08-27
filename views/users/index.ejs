@@ -96,6 +96,11 @@
                   <tr>
                     <td><code><%= user.id %></code></td>
                     <td>
+                      <% if (user.avatar) { %>
+                        <img src="<%= user.avatar %>" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; margin-right: 6px; vertical-align: middle; border: 1px solid #bae6fd;">
+                      <% } else { %>
+                        <i class="fa <%= user.role === 'admin' ? 'fa-shield text-danger' : 'fa-user text-primary' %>" style="margin-right: 6px;"></i>
+                      <% } %>
                       <strong><%= user.username %></strong>
                       <% if (currentUser && currentUser.id === user.id) { %>
                         <span class="label label-info" style="margin-left: 5px;">Akun Anda</span>

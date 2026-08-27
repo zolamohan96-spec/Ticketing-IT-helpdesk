@@ -224,6 +224,11 @@ const userStore = {
     targetUser.name = name;
     targetUser.email = email;
     targetUser.role = role;
+    if (input.avatar) {
+      targetUser.avatar = input.avatar;
+    } else if (input.removeAvatar === 'true') {
+      targetUser.avatar = null;
+    }
     targetUser.updatedAt = now();
 
     // If password provided, update hash and salt
@@ -282,6 +287,11 @@ const userStore = {
 
     targetUser.name = name;
     targetUser.email = email;
+    if (input.avatar) {
+      targetUser.avatar = input.avatar;
+    } else if (input.removeAvatar === 'true') {
+      targetUser.avatar = null;
+    }
     targetUser.updatedAt = now();
 
     users[targetIndex] = targetUser;

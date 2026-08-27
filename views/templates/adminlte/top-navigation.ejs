@@ -19,7 +19,12 @@
         <% if (currentUser) { %>
         <form method="post" action="/auth/logout" class="navbar-form navbar-right user-nav-form">
           <a href="/profile" class="navbar-text user-info-badge" title="Klik untuk mengedit profil dan ganti password" style="text-decoration: none; cursor: pointer;">
-            <i class="fa fa-user-circle"></i> <%= currentUser.name || currentUser.username %>
+            <% if (currentUser.avatar) { %>
+              <img src="<%= currentUser.avatar %>" alt="Avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; margin-right: 5px; vertical-align: middle; border: 1px solid rgba(255,255,255,0.4);">
+            <% } else { %>
+              <i class="fa fa-user-circle"></i>
+            <% } %>
+            <%= currentUser.name || currentUser.username %>
             <span class="badge <%= currentUser.role === 'admin' ? 'badge-admin' : 'badge-user' %>"><%= currentUser.role === 'admin' ? 'Admin' : 'User' %></span>
           </a>
           <button type="submit" class="btn btn-default btn-sm"><i class="fa fa-sign-out"></i> Keluar</button>
