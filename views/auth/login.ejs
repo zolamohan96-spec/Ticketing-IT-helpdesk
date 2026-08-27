@@ -3,129 +3,156 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | Helpdesk Central</title>
+  <title>Masuk | Helpdesk Central</title>
   <link rel="stylesheet" href="/script-adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/script-adminlte/bower_components/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/script-adminlte/dist/css/AdminLTE.min.css">
-  <link rel="stylesheet" href="/css/ticketing.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/ticketing.css">
 </head>
-<body class="modern-login-body">
-  <div class="login-backdrop">
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
+<body class="premium-login-body">
+  <!-- Background Glow & Grid -->
+  <div class="login-bg-mesh">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-grid-overlay"></div>
   </div>
 
-  <div class="modern-login-container">
-    <div class="login-card">
-      <!-- Brand Header -->
-      <div class="card-brand-header">
-        <div class="brand-badge-icon">
-          <i class="fa fa-life-ring"></i>
-        </div>
-        <h1 class="brand-title">Helpdesk <span>Central</span></h1>
-        <p class="brand-subtitle">Portal Layanan Troubleshooting & Antrean Tiket IT</p>
-      </div>
-
-      <!-- Alert Error -->
-      <% if (error) { %>
-        <div class="modern-alert modern-alert-danger">
-          <i class="fa fa-exclamation-circle alert-icon"></i>
-          <div class="alert-content"><%= error %></div>
-        </div>
-      <% } %>
-
-      <!-- Login Form -->
-      <form method="post" action="/auth/login" id="loginForm" class="modern-form">
-        <input type="hidden" name="next" value="<%= next || '/' %>">
-
-        <div class="form-group-modern">
-          <label for="usernameInput" class="modern-label">Username</label>
-          <div class="input-wrapper">
-            <i class="fa fa-user-circle input-icon"></i>
-            <input type="text" id="usernameInput" name="username" class="modern-input" placeholder="Masukkan username Anda" required autofocus autocomplete="username">
+  <div class="login-wrapper">
+    <div class="login-split-card">
+      <!-- Left Hero Banner -->
+      <div class="login-hero-side">
+        <div class="hero-brand">
+          <div class="hero-logo-box">
+            <i class="fa fa-life-ring"></i>
+          </div>
+          <div class="hero-brand-text">
+            <h2>Helpdesk <span>Central</span></h2>
+            <p>IT Service &amp; Ticket Management</p>
           </div>
         </div>
 
-        <div class="form-group-modern">
-          <div class="label-row">
-            <label for="passwordInput" class="modern-label">Password</label>
-            <span class="password-toggle" onclick="togglePasswordVisibility()" title="Tampilkan / Sembunyikan Password">
-              <i class="fa fa-eye" id="togglePasswordIcon"></i> <span id="togglePasswordText">Lihat</span>
-            </span>
+        <div class="hero-tagline">
+          <span class="live-pill"><span class="live-dot"></span> Sistem Antrean Online</span>
+          <h3>Solusi terpadu pemantauan kendala &amp; layanan IT perusahaan.</h3>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-item">
+            <div class="feature-icon"><i class="fa fa-clock-o"></i></div>
+            <div class="feature-info">
+              <strong>Urutan Antrean Real-Time</strong>
+              <span>Setiap tiket mendapatkan nomor antrean FIFO otomatis</span>
+            </div>
           </div>
-          <div class="input-wrapper">
-            <i class="fa fa-lock input-icon"></i>
-            <input type="password" id="passwordInput" name="password" class="modern-input" placeholder="Masukkan password Anda" required autocomplete="current-password">
+          <div class="feature-item">
+            <div class="feature-icon"><i class="fa fa-shield"></i></div>
+            <div class="feature-info">
+              <strong>Hak Akses Multi-Peran</strong>
+              <span>Panel khusus Administrator dan Pengguna (User)</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon"><i class="fa fa-mobile"></i></div>
+            <div class="feature-info">
+              <strong>Dukungan Aplikasi Android</strong>
+              <span>Upload foto kendala langsung dari kamera / galeri HP</span>
+            </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-modern-primary" id="submitBtn">
-          <span>Masuk ke Akun</span>
-          <i class="fa fa-arrow-right"></i>
-        </button>
-      </form>
-
-      <!-- Divider -->
-      <div class="modern-divider">
-        <span>KREDENSIAL DEMO</span>
-      </div>
-
-      <!-- Credential Quick Cards -->
-      <div class="quick-credentials-grid">
-        <!-- Admin Card -->
-        <div class="quick-card quick-card-admin" onclick="applyCreds('admin', 'Admin@12345', this)">
-          <div class="quick-card-header">
-            <div class="quick-role-badge badge-role-admin">
-              <i class="fa fa-shield"></i> Admin
-            </div>
-            <span class="quick-btn-tag"><i class="fa fa-check"></i> Gunakan</span>
-          </div>
-          <div class="quick-card-body">
-            <div class="quick-user-info">
-              <span class="cred-label">User:</span> <code>admin</code>
-            </div>
-            <div class="quick-user-info">
-              <span class="cred-label">Pass:</span> <code>Admin@12345</code>
-            </div>
-          </div>
-          <div class="quick-card-footer">
-            Akses penuh & kelola user
-          </div>
-        </div>
-
-        <!-- User Card -->
-        <div class="quick-card quick-card-user" onclick="applyCreds('user', 'User@12345', this)">
-          <div class="quick-card-header">
-            <div class="quick-role-badge badge-role-user">
-              <i class="fa fa-user"></i> User
-            </div>
-            <span class="quick-btn-tag"><i class="fa fa-check"></i> Gunakan</span>
-          </div>
-          <div class="quick-card-body">
-            <div class="quick-user-info">
-              <span class="cred-label">User:</span> <code>user</code>
-            </div>
-            <div class="quick-user-info">
-              <span class="cred-label">Pass:</span> <code>User@12345</code>
-            </div>
-          </div>
-          <div class="quick-card-footer">
-            Buat & pantau antrean tiket
-          </div>
+        <div class="hero-footer">
+          <i class="fa fa-lock"></i> Terproteksi enkripsi PBKDF2 &bull; Versi 2.0
         </div>
       </div>
 
-      <!-- Card Footer -->
-      <div class="login-card-footer">
-        <a href="/download/apk" class="apk-download-btn" title="Unduh file instalasi APK untuk HP Android">
-          <i class="fa fa-android"></i> Unduh Aplikasi Android (.APK)
+      <!-- Right Form Section -->
+      <div class="login-form-side">
+        <div class="form-header">
+          <h3>Selamat Datang</h3>
+          <p>Silakan masuk untuk mengakses portal tiket &amp; antrean</p>
+        </div>
+
+        <!-- Alert Error -->
+        <% if (error) { %>
+          <div class="form-alert form-alert-danger">
+            <i class="fa fa-exclamation-circle"></i>
+            <div><%= error %></div>
+          </div>
+        <% } %>
+
+        <form method="post" action="/auth/login" id="loginForm" class="auth-form">
+          <input type="hidden" name="next" value="<%= next || '/' %>">
+
+          <div class="auth-field-group">
+            <label for="usernameInput" class="auth-label">Username</label>
+            <div class="auth-input-box">
+              <i class="fa fa-user-circle auth-icon"></i>
+              <input type="text" id="usernameInput" name="username" class="auth-input" placeholder="Masukkan username Anda" required autofocus autocomplete="username">
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <div class="auth-label-row">
+              <label for="passwordInput" class="auth-label">Password</label>
+              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility()" title="Tampilkan / Sembunyikan Password">
+                <i class="fa fa-eye" id="togglePasswordIcon"></i> <span id="togglePasswordText">Lihat</span>
+              </button>
+            </div>
+            <div class="auth-input-box">
+              <i class="fa fa-lock auth-icon"></i>
+              <input type="password" id="passwordInput" name="password" class="auth-input" placeholder="Masukkan password Anda" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login-submit" id="submitBtn">
+            <span>Masuk ke Akun</span>
+            <i class="fa fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+          <span>AKSES CEPAT KREDENSIAL</span>
+        </div>
+
+        <!-- Quick Demo Credentials -->
+        <div class="demo-creds-container">
+          <div class="demo-card demo-card-admin" onclick="applyCreds('admin', 'Admin@12345', this)">
+            <div class="demo-card-top">
+              <span class="role-tag role-tag-admin"><i class="fa fa-shield"></i> Admin</span>
+              <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
+            </div>
+            <div class="demo-card-body">
+              <div class="cred-row"><span>User:</span> <code>admin</code></div>
+              <div class="cred-row"><span>Pass:</span> <code>Admin@12345</code></div>
+            </div>
+            <div class="demo-card-bottom">Kelola tiket, antrean &amp; tambah user</div>
+          </div>
+
+          <div class="demo-card demo-card-user" onclick="applyCreds('user', 'User@12345', this)">
+            <div class="demo-card-top">
+              <span class="role-tag role-tag-user"><i class="fa fa-user"></i> User</span>
+              <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
+            </div>
+            <div class="demo-card-body">
+              <div class="cred-row"><span>User:</span> <code>user</code></div>
+              <div class="cred-row"><span>Pass:</span> <code>User@12345</code></div>
+            </div>
+            <div class="demo-card-bottom">Buat laporan &amp; cek status tiket</div>
+          </div>
+        </div>
+
+        <!-- Download APK Section -->
+        <a href="/download/apk" class="apk-download-action">
+          <div class="apk-icon-circle"><i class="fa fa-android"></i></div>
+          <div class="apk-text-group">
+            <strong>Unduh Aplikasi Android (.APK)</strong>
+            <span>Instal di HP untuk akses praktis &amp; cepat</span>
+          </div>
+          <span class="apk-badge">v2.0 APK</span>
         </a>
-        <div class="security-note">
-          <i class="fa fa-lock"></i> Terenkripsi aman dengan salted PBKDF2 &bull; Helpdesk v2.0
-        </div>
       </div>
     </div>
   </div>
@@ -138,16 +165,15 @@
       uInput.value = username;
       pInput.value = password;
       
-      // Visual feedback
-      document.querySelectorAll('.quick-card').forEach(c => c.classList.remove('selected-card'));
-      if (cardElem) cardElem.classList.add('selected-card');
+      document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active-demo-card'));
+      if (cardElem) cardElem.classList.add('active-demo-card');
       
-      uInput.classList.add('input-highlight');
-      pInput.classList.add('input-highlight');
+      uInput.classList.add('highlight-pulse');
+      pInput.classList.add('highlight-pulse');
       setTimeout(() => {
-        uInput.classList.remove('input-highlight');
-        pInput.classList.remove('input-highlight');
-      }, 500);
+        uInput.classList.remove('highlight-pulse');
+        pInput.classList.remove('highlight-pulse');
+      }, 400);
 
       document.getElementById('submitBtn').focus();
     }
