@@ -323,8 +323,6 @@ router.post('/tickets/:id/notes', (req, res) => {
   res.redirect(`/tickets/${req.params.id}`);
 });
 
-router.get('/siswa', (req, res) => res.redirect('/tickets'));
-router.get('/siswa/*', (req, res) => res.redirect('/tickets'));
 router.use((req, res) => res.status(404).render('main/notfound'));
 
 module.exports = router;
