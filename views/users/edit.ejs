@@ -1,0 +1,106 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1>Edit Pengguna <small>Perbarui data profil, peran, dan password akun</small></h1>
+    </section>
+
+    <section class="content">
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <i class="fa fa-exclamation-circle"></i> <%= error %>
+        </div>
+      <% } %>
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="panel-title"><i class="fa fa-pencil-square-o"></i> Formulir Edit Pengguna: <strong><%= user.username %></strong></span>
+            </div>
+            <div class="panel-body">
+              <form method="post" action="/users/<%= user.id %>/edit">
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="username">Username (ID: <code><%= user.id %></code>)</label>
+                    <input id="username" class="form-control" value="<%= user.username %>" disabled readonly style="background-color: #f1f5f9; font-weight: bold;">
+                    <p class="help-block">Username sistem bersifat permanen dan tidak dapat diubah.</p>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="name">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input id="name" name="name" class="form-control" value="<%= values.name || user.name || '' %>" required placeholder="Contoh: Budi Santoso" autofocus>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="email">Alamat Email</label>
+                    <input id="email" name="email" type="email" class="form-control" value="<%= values.email || user.email || '' %>" placeholder="nama@perusahaan.id">
+                    <p class="help-block">Opsional untuk kontak notifikasi.</p>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="role">Peran (Role) <span class="text-danger">*</span></label>
+                    <% if (user.username.toLowerCase() === 'admin') { %>
+                      <input type="hidden" name="role" value="admin">
+                      <select class="form-control" disabled>
+                        <option value="admin" selected>Admin (Administrator Sistem - Utama)</option>
+                      </select>
+                      <p class="help-block text-warning"><i class="fa fa-lock"></i> Akun admin utama harus tetap memiliki peran Administrator.</p>
+                    <% } else { %>
+                      <select id="role" name="role" class="form-control" required>
+                        <option value="user" <%= (values.role || user.role) === 'user' ? 'selected' : '' %>>User (Pengguna Standar)</option>
+                        <option value="admin" <%= (values.role || user.role) === 'admin' ? 'selected' : '' %>>Admin (Administrator Sistem)</option>
+                      </select>
+                    <% } %>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="callout callout-info" style="background-color: #f0f9ff !important; border-left-color: #0284c7; color: #0369a1; padding: 10px 15px; margin-bottom: 15px;">
+                  <h5 style="margin-top: 0; font-weight: bold;"><i class="fa fa-key"></i> Ubah Password (Opsional)</h5>
+                  <p style="margin-bottom: 0; font-size: 13px;">Biarkan kedua kolom password di bawah ini <strong>kosong</strong> jika Anda tidak ingin mengganti password pengguna saat ini.</p>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="password">Password Baru</label>
+                    <input id="password" name="password" type="password" class="form-control" placeholder="Kosongkan jika tidak diubah">
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="confirmPassword">Konfirmasi Password Baru</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" placeholder="Ketik ulang password baru">
+                  </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 15px;">
+                  <a href="/users" class="btn btn-default"><i class="fa fa-arrow-left"></i> Batal</a>
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Perbarui Pengguna</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <span class="panel-title"><i class="fa fa-info-circle"></i> Informasi Akun</span>
+            </div>
+            <div class="panel-body">
+              <p><strong>ID Pengguna:</strong> <code><%= user.id %></code></p>
+              <p><strong>Tanggal Dibuat:</strong><br><%= new Date(user.createdAt).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) %></p>
+              <p><strong>Terakhir Diperbarui:</strong><br><%= new Date(user.updatedAt || user.createdAt).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) %></p>
+              <hr>
+              <p class="text-muted" style="font-size: 13px;">
+                <i class="fa fa-shield text-success"></i> Password tersimpan dengan enkripsi aman PBKDF2 (SHA-512) dengan 10.000 iterasi dan salt unik.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

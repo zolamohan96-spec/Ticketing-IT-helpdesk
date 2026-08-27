@@ -111,10 +111,11 @@
                     </td>
                     <td><%= new Date(user.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
                     <td class="text-right">
+                      <a href="/users/<%= user.id %>/edit" class="btn btn-warning btn-xs" style="margin-right: 4px;" title="Edit Pengguna"><i class="fa fa-pencil"></i> Edit</a>
                       <% if (user.username.toLowerCase() === 'admin') { %>
-                        <span class="text-muted" title="Akun admin utama tidak dapat dihapus"><i class="fa fa-lock"></i> Sistem</span>
+                        <span class="text-muted" title="Akun admin utama tidak dapat dihapus" style="font-size: 11px;"><i class="fa fa-lock"></i> Utama</span>
                       <% } else if (currentUser && currentUser.id === user.id) { %>
-                        <span class="text-muted" title="Tidak dapat menghapus akun sendiri yang aktif"><i class="fa fa-check"></i> Aktif</span>
+                        <span class="text-muted" title="Tidak dapat menghapus akun sendiri yang sedang aktif" style="font-size: 11px;"><i class="fa fa-check"></i> Aktif</span>
                       <% } else { %>
                         <form method="post" action="/users/<%= user.id %>/delete" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna \'<%= user.username %>\'? Tindakan ini tidak dapat dibatalkan.');">
                           <button type="submit" class="btn btn-danger btn-xs" title="Hapus Pengguna"><i class="fa fa-trash"></i> Hapus</button>

@@ -129,6 +129,63 @@ router.post('/users', requireAdmin, (req, res) => {
   }
 });
 
+router.get('/users/:id/edit', requireAdmin, (req, res) => {
+  const targetUser = userStore.find(req.params.id);
+  if (!targetUser) {
+    req.flash('message', { type: 'danger', text: 'Pengguna tidak ditemukan.' });
+    return res.redirect('/users');
+  }
+  res.render('users/edit', {
+    title: `Edit Pengguna: ${targetUser.username}`,
+    user: targetUser,
+    values: targetUser,
+    error: null
+  });
+});
+
+router.post('/users/:id/edit', requireAdmin, (req, res) => {
+  const targetUser = userStore.find(req.params.id);
+  if (!targetUser) {
+    req.flash('message', { type: 'danger', text: 'Pengguna tidak ditemukan.' });
+    return res.redirect('/users');
+  }
+
+  const { name, email, role, password, confirmPassword } = req.body;
+
+  if (password && password !== confirmPassword) {
+    return res.status(400).render('users/edit', {
+      title: `Edit Pengguna: ${targetUser.username}`,
+      user: targetUser,
+      values: { ...targetUser, name, email, role },
+      error: 'Konfirmasi password baru tidak cocok.'
+    });
+  }
+
+  try {
+    const updated = userStore.update(req.params.id, { name, email, role, password }, req.session.user.id);
+    
+    // If the admin edited their own active account, update the session
+    if (req.session.user.id === updated.id) {
+      req.session.user.name = updated.name;
+      req.session.user.email = updated.email;
+      req.session.user.role = updated.role;
+    }
+
+    req.flash('message', {
+      type: 'success',
+      text: `Data pengguna "${updated.username}" berhasil diperbarui.`
+    });
+    res.redirect('/users');
+  } catch (err) {
+    res.status(400).render('users/edit', {
+      title: `Edit Pengguna: ${targetUser.username}`,
+      user: targetUser,
+      values: { ...targetUser, name, email, role },
+      error: err.message
+    });
+  }
+});
+
 router.post('/users/:id/delete', requireAdmin, (req, res) => {
   try {
     userStore.delete(req.params.id, req.session.user.id);

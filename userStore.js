@@ -199,6 +199,48 @@ const userStore = {
     return true;
   },
 
+  update(id, input, currentUserId) {
+    const users = read();
+    const targetIndex = users.findIndex(u => u.id === id);
+    if (targetIndex === -1) {
+      throw new Error('Pengguna tidak ditemukan.');
+    }
+
+    const targetUser = users[targetIndex];
+    const name = (input.name || '').trim();
+    const email = (input.email || '').trim();
+    const role = input.role === 'admin' ? 'admin' : 'user';
+    const password = input.password;
+
+    if (!name) {
+      throw new Error('Nama lengkap wajib diisi.');
+    }
+
+    // Protect main admin role from being demoted to user
+    if (targetUser.username.toLowerCase() === 'admin' && role !== 'admin') {
+      throw new Error('Peran akun admin utama sistem harus tetap Administrator.');
+    }
+
+    targetUser.name = name;
+    targetUser.email = email;
+    targetUser.role = role;
+    targetUser.updatedAt = now();
+
+    // If password provided, update hash and salt
+    if (password && password.trim()) {
+      if (password.length < 6) {
+        throw new Error('Password baru minimal 6 karakter.');
+      }
+      const newSalt = generateSalt();
+      targetUser.salt = newSalt;
+      targetUser.passwordHash = hashPassword(password, newSalt);
+    }
+
+    users[targetIndex] = targetUser;
+    write(users);
+    return safeUser(targetUser);
+  },
+
   stats() {
     const users = read();
     return {
