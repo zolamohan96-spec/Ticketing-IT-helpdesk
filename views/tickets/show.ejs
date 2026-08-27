@@ -1,0 +1,182 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1><%= ticket.id %> <small>Detail dan pemantauan penanganan</small></h1>
+    </section>
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <!-- Notifikasi Urutan Antrean -->
+      <% if (queueInfo && queueInfo.inQueue) { %>
+        <div class="queue-callout-box queue-callout-active">
+          <div class="queue-number-box">
+            <div class="queue-num-label">NO. ANTREAN</div>
+            <div class="queue-num-value">#<%= queueInfo.position %></div>
+            <div class="queue-num-total">dari <%= queueInfo.total %> tiket aktif</div>
+          </div>
+          <div class="queue-info-content">
+            <h4><i class="fa fa-clock-o"></i> Notifikasi Urutan Antrean</h4>
+            <p>Tiket ini berada pada <strong>urutan antrean ke-<%= queueInfo.position %></strong> dari total <strong><%= queueInfo.total %> tiket aktif</strong> di antrean sistem helpdesk. Tim IT menangani laporan sesuai prioritas dan nomor antrean.</p>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="queue-callout-box queue-callout-resolved">
+          <div class="queue-number-box">
+            <i class="fa fa-check-circle queue-done-icon"></i>
+          </div>
+          <div class="queue-info-content">
+            <h4><i class="fa fa-check"></i> Tiket Selesai</h4>
+            <p>Laporan ini berstatus <strong><%= ticket.status %></strong> dan telah selesai ditangani.</p>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="ticket-card">
+            <div class="clearfix">
+              <div class="pull-right">
+                <% if (ticket.queuePosition) { %>
+                  <span class="badge badge-queue" style="font-size: 12px; padding: 6px 10px;">
+                    <i class="fa fa-list-ol"></i> Antrean #<%= ticket.queuePosition %>
+                  </span>
+                <% } %>
+                <span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span>
+                <span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span>
+              </div>
+              <h2 style="margin-top:0"><%= ticket.title %></h2>
+            </div>
+            <div class="ticket-meta">
+              <i class="fa fa-user"></i> Dilaporkan oleh <strong><%= ticket.requester %></strong>
+              <% if (ticket.email) { %> · <i class="fa fa-envelope-o"></i> <%= ticket.email %><% } %>
+              · <span class="label label-default"><%= ticket.category %></span>
+              <% if (ticket.assignee) { %> · <i class="fa fa-wrench"></i> Teknisi: <strong><%= ticket.assignee %></strong><% } %>
+            </div>
+            <hr>
+            <div class="ticket-description"><%= ticket.description %></div>
+
+            <% if (ticket.attachment && ticket.attachment.url) { %>
+              <hr>
+              <div class="ticket-attachment">
+                <strong><i class="fa fa-paperclip"></i> Lampiran awal laporan</strong>
+                <a href="<%= ticket.attachment.url %>" target="_blank" rel="noopener">
+                  <img src="<%= ticket.attachment.url %>" alt="Lampiran <%= ticket.id %>">
+                </a>
+                <small><%= ticket.attachment.originalName %></small>
+              </div>
+            <% } %>
+
+            <% if (ticket.resolutionAttachment && ticket.resolutionAttachment.url) { %>
+              <hr>
+              <div class="ticket-attachment">
+                <strong><i class="fa fa-check-circle"></i> Foto bukti setelah penyelesaian</strong>
+                <a href="<%= ticket.resolutionAttachment.url %>" target="_blank" rel="noopener">
+                  <img src="<%= ticket.resolutionAttachment.url %>" alt="Bukti penyelesaian <%= ticket.id %>">
+                </a>
+                <small><%= ticket.resolutionAttachment.originalName %></small>
+              </div>
+            <% } %>
+
+            <hr>
+            <div class="ticket-meta">
+              Dibuat: <%= new Date(ticket.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %> ·
+              Diperbarui: <%= new Date(ticket.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="panel-title"><i class="fa fa-history"></i> Riwayat & Catatan Penanganan</span>
+            </div>
+            <div class="panel-body">
+              <% if (!ticket.notes || !ticket.notes.length) { %>
+                <p class="text-muted">Belum ada catatan troubleshooting.</p>
+              <% } else { %>
+                <% ticket.notes.slice().reverse().forEach(note => { %>
+                  <div class="note">
+                    <strong><%= note.author %></strong>
+                    <small class="pull-right"><%= new Date(note.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></small>
+                    <div style="margin-top: 5px;"><%= note.text %></div>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <!-- Panel Update Khusus Administrator -->
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="panel-title"><i class="fa fa-pencil"></i> Tindak Lanjut Tiket (Admin)</span>
+              </div>
+              <div class="panel-body">
+                <form method="post" action="/tickets/<%= ticket.id %>/update" enctype="multipart/form-data">
+                  <div class="form-group">
+                    <label>Status Tiket</label>
+                    <select name="status" class="form-control">
+                      <% statuses.forEach(status => { %>
+                        <option <%= ticket.status === status ? 'selected' : '' %>><%= status %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Prioritas</label>
+                    <select name="priority" class="form-control">
+                      <% priorities.forEach(priority => { %>
+                        <option <%= ticket.priority === priority ? 'selected' : '' %>><%= priority %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Penanggung Jawab / Teknisi</label>
+                    <input name="assignee" value="<%= ticket.assignee %>" class="form-control" placeholder="Nama teknisi / tim IT">
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label>Tambah Catatan Penanganan</label>
+                    <input name="noteAuthor" class="form-control" value="<%= currentUser.name || currentUser.username %>" placeholder="Nama support">
+                    <br>
+                    <textarea name="noteText" rows="3" class="form-control" placeholder="Tulis tindakan, progres, atau hasil pemeriksaan..."></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Foto Bukti Penyelesaian</label>
+                    <input name="resolutionPhoto" type="file" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif">
+                    <p class="help-block">Opsional (JPG/PNG maks. 5 MB).</p>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-save"></i> Simpan Perubahan</button>
+                </form>
+              </div>
+            </div>
+          <% } else { %>
+            <!-- Panel Catatan Tambahan untuk Pengguna Standar -->
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="panel-title"><i class="fa fa-comment-o"></i> Tambah Informasi / Balasan</span>
+              </div>
+              <div class="panel-body">
+                <form method="post" action="/tickets/<%= ticket.id %>/notes">
+                  <div class="form-group">
+                    <label>Pesan / Informasi Tambahan</label>
+                    <textarea name="text" rows="4" class="form-control" required placeholder="Tulis pesan atau perkembangan masalah dari perangkat Anda..."></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-paper-plane"></i> Kirim Pesan</button>
+                </form>
+              </div>
+            </div>
+          <% } %>
+
+          <a href="/tickets" class="btn btn-default btn-block"><i class="fa fa-arrow-left"></i> Kembali ke Daftar Tiket</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

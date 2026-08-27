@@ -4,7 +4,7 @@
   "description": "Membuat website dengan framework expressjs",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
+    "dev": "node --watch app.js",
     "db_reset": "sequelize db:drop && sequelize db:create && sequelize db:migrate && sequelize db:seed:all",
     "db_start": "sequelize db:create && sequelize db:migrate && sequelize db:seed:all"
   },
@@ -22,6 +22,7 @@
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "faker": "^4.1.0",
+    "multer": "^1.4.5-lts.1",
     "mysql": "^2.15.0",
     "mysql2": "^1.5.3",
     "pg": "^7.4.3",
@@ -31,5 +32,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MuhammadFariMadyan/crud-express-mysql.git"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }

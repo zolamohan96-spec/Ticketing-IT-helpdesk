@@ -1,0 +1,161 @@
+[
+  {
+    "id": "TKT-1003",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "VPN kantor tidak bisa tersambung",
+    "requester": "Pengguna Standar",
+    "email": "user@helpdesk.local",
+    "category": "Network",
+    "priority": "High",
+    "status": "Closed",
+    "assignee": "Andi Support",
+    "description": "VPN terputus sejak pagi dan muncul pesan timeout saat login dari laptop kantor.",
+    "notes": [
+      {
+        "author": "Andi Support",
+        "text": "Sedang memeriksa konfigurasi gateway dan akun pengguna.",
+        "createdAt": "2026-08-25T08:30:00.000Z"
+      }
+    ],
+    "createdAt": "2026-08-25T07:50:00.000Z",
+    "updatedAt": "2026-08-27T02:54:50.065Z",
+    "resolutionAttachment": null
+  },
+  {
+    "id": "TKT-1002",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "Printer lantai 2 tidak mencetak",
+    "requester": "Pengguna Standar",
+    "email": "user@helpdesk.local",
+    "category": "Hardware",
+    "priority": "Medium",
+    "status": "Closed",
+    "assignee": "",
+    "description": "Dokumen masuk antrean tetapi tidak keluar dari printer ruang operasional.",
+    "notes": [],
+    "createdAt": "2026-08-25T07:10:00.000Z",
+    "updatedAt": "2026-08-27T02:55:12.975Z"
+  },
+  {
+    "id": "TKT-1001",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "Permintaan akses folder laporan bulanan",
+    "requester": "Pengguna Standar",
+    "email": "user@helpdesk.local",
+    "category": "Access",
+    "priority": "Low",
+    "status": "Closed",
+    "assignee": "Raka IT",
+    "description": "Mohon akses baca ke folder laporan bulanan untuk kebutuhan rekap.",
+    "notes": [
+      {
+        "author": "Raka IT",
+        "text": "Akses baca sudah diberikan. Silakan coba kembali.",
+        "createdAt": "2026-08-24T10:20:00.000Z"
+      }
+    ],
+    "createdAt": "2026-08-24T09:40:00.000Z",
+    "updatedAt": "2026-08-26T01:53:41.332Z"
+  },
+  {
+    "id": "TKT-1004",
+    "userId": "USR-1001",
+    "createdBy": "admin",
+    "title": "laptop tidak bisa di gunakan",
+    "requester": "Administrator",
+    "email": "admin@helpdesk.local",
+    "category": "Hardware",
+    "priority": "Medium",
+    "status": "Closed",
+    "assignee": "zola",
+    "description": "laptop nya sering restart",
+    "attachment": {
+      "originalName": "black-series-0.025.png",
+      "filename": "1787707202394-181178090.png",
+      "mimeType": "image/png",
+      "size": 52616,
+      "url": "/uploads/1787707202394-181178090.png"
+    },
+    "notes": [],
+    "createdAt": "2026-08-26T01:20:02.421Z",
+    "updatedAt": "2026-08-27T02:54:58.429Z",
+    "resolutionAttachment": {
+      "originalName": "gambar custom.png",
+      "filename": "1787707294032-992374544.png",
+      "mimeType": "image/png",
+      "size": 42800,
+      "url": "/uploads/1787707294032-992374544.png"
+    }
+  },
+  {
+    "id": "TKT-1005",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "Test Laptop Error",
+    "requester": "Pengguna Standar",
+    "email": "user@helpdesk.local",
+    "category": "Hardware",
+    "priority": "High",
+    "status": "Closed",
+    "assignee": "",
+    "description": "Test description queue",
+    "attachment": null,
+    "notes": [],
+    "createdAt": "2026-08-27T02:50:27.501Z",
+    "updatedAt": "2026-08-27T02:54:38.526Z"
+  },
+  {
+    "id": "TKT-1006",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "tidak bisa internet",
+    "requester": "zodi",
+    "email": "user@helpdesk.local",
+    "category": "Network",
+    "priority": "Medium",
+    "status": "Closed",
+    "assignee": "zola",
+    "description": "internet tidak bisa digunakan",
+    "attachment": null,
+    "notes": [],
+    "createdAt": "2026-08-27T02:53:02.069Z",
+    "updatedAt": "2026-08-27T02:54:21.023Z"
+  },
+  {
+    "id": "TKT-1007",
+    "userId": "USR-1002",
+    "createdBy": "user",
+    "title": "laptop mati",
+    "requester": "zodi",
+    "email": "user@helpdesk.local",
+    "category": "Hardware",
+    "priority": "Medium",
+    "status": "Resolved",
+    "assignee": "zola",
+    "description": "Laptop tiba tiba mati",
+    "attachment": null,
+    "notes": [],
+    "createdAt": "2026-08-27T02:59:26.288Z",
+    "updatedAt": "2026-08-27T03:00:35.661Z"
+  },
+  {
+    "id": "TKT-1008",
+    "userId": "USR-1003",
+    "createdBy": "admin2",
+    "title": "internet mati",
+    "requester": "Zolam",
+    "email": "",
+    "category": "Network",
+    "priority": "Medium",
+    "status": "Closed",
+    "assignee": "Andi Support",
+    "description": "internet tidak bisa digunakan",
+    "attachment": null,
+    "notes": [],
+    "createdAt": "2026-08-27T03:00:07.930Z",
+    "updatedAt": "2026-08-27T03:01:06.628Z"
+  }
+]

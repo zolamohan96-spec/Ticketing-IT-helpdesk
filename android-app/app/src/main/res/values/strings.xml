@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Helpdesk Central</string>
+    <string name="default_server_url">http://192.168.18.123:3300</string>
+    <string name="pref_server_url">server_url</string>
+    <string name="server_settings">Pengaturan Server</string>
+    <string name="server_url_hint">http://192.168.x.x:3300 atau domain</string>
+    <string name="btn_save">Simpan &amp; Hubungkan</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="btn_retry">Coba Lagi</string>
+    <string name="connection_error_title">Gagal Terhubung ke Server</string>
+    <string name="connection_error_desc">Pastikan server Helpdesk Central sedang berjalan dan alamat IP/URL server sudah benar.</string>
+</resources>

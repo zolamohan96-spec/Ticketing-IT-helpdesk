@@ -1,0 +1,109 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1><%= currentUser && currentUser.role === 'admin' ? 'Semua Tiket' : 'Daftar Tiket Saya' %> <small><%= currentUser && currentUser.role === 'admin' ? 'Monitor dan tindak lanjuti seluruh laporan & antrean' : 'Pantau tiket dan urutan antrean Anda' %></small></h1>
+    </section>
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="get" action="/tickets" class="row">
+            <div class="col-md-5 form-group">
+              <label for="q">Cari tiket</label>
+              <input id="q" name="q" value="<%= filters.q || '' %>" class="form-control" placeholder="ID, judul, masalah, kategori...">
+            </div>
+            <div class="col-md-2 form-group">
+              <label for="status">Status</label>
+              <select id="status" name="status" class="form-control">
+                <option value="">Semua status</option>
+                <% statuses.forEach(status => { %>
+                  <option <%= filters.status === status ? 'selected' : '' %>><%= status %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-2 form-group">
+              <label for="priority">Prioritas</label>
+              <select id="priority" name="priority" class="form-control">
+                <option value="">Semua prioritas</option>
+                <% priorities.forEach(priority => { %>
+                  <option <%= filters.priority === priority ? 'selected' : '' %>><%= priority %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-3 form-group filter-actions">
+              <label>&nbsp;</label>
+              <div>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Terapkan filter</button>
+                <a href="/tickets" class="btn btn-default">Reset</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="fa fa-ticket"></i> <%= tickets.length %> tiket ditemukan</span>
+          <a href="/tickets/new" class="btn btn-primary btn-sm pull-right"><i class="fa fa-plus"></i> Buat tiket</a>
+        </div>
+        <div class="panel-body table-responsive">
+          <% if (!tickets.length) { %>
+            <div class="empty-state">
+              <i class="fa fa-search"></i>
+              <p>Tiket tidak ditemukan.</p>
+              <a href="/tickets/new" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Buat Tiket Baru</a>
+            </div>
+          <% } else { %>
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>No. Antrean</th>
+                  <th>ID</th>
+                  <th>Masalah</th>
+                  <th>Pelapor</th>
+                  <th>Kategori</th>
+                  <th>Status</th>
+                  <th>Prioritas</th>
+                  <th>Penanggung jawab</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% tickets.forEach(ticket => { %>
+                  <tr>
+                    <td>
+                      <% if (ticket.queuePosition) { %>
+                        <span class="badge badge-queue" title="Urutan ke-<%= ticket.queuePosition %> dalam antrean aktif">
+                          <i class="fa fa-list-ol"></i> Antrean #<%= ticket.queuePosition %>
+                        </span>
+                      <% } else { %>
+                        <span class="badge badge-resolved"><i class="fa fa-check"></i> Selesai</span>
+                      <% } %>
+                    </td>
+                    <td><a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.id %></a></td>
+                    <td>
+                      <a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.title %></a>
+                      <div class="ticket-meta"><%= new Date(ticket.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></div>
+                    </td>
+                    <td><%= ticket.requester %></td>
+                    <td><%= ticket.category %></td>
+                    <td><span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span></td>
+                    <td><span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span></td>
+                    <td><%= ticket.assignee || 'Belum ditugaskan' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

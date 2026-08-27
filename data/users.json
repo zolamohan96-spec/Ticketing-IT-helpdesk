@@ -1,0 +1,35 @@
+[
+  {
+    "id": "USR-1001",
+    "username": "admin",
+    "name": "Administrator",
+    "email": "admin@helpdesk.local",
+    "role": "admin",
+    "salt": "2c81b9ef7c32943eb34692f088fbae31",
+    "passwordHash": "257daba16a843c1b21bc4ef94fd110e823024fdde95bd072436eef57b8f88ce4ba7653852116a39120fa671c920705f2279631eb538d3286ef8f411a76fd6c79",
+    "createdAt": "2026-08-27T02:43:57.953Z",
+    "updatedAt": "2026-08-27T02:43:57.953Z"
+  },
+  {
+    "id": "USR-1002",
+    "username": "user",
+    "name": "Pengguna Standar",
+    "email": "user@helpdesk.local",
+    "role": "user",
+    "salt": "58f98f6ba9fc71b1e0f8644761d6741b",
+    "passwordHash": "0c79ca902a71cb51bf83f32bd20047f59e015fcf62241c24155edfe7b2d2c20bc29a98f7db497924939d00a369a83050e8939637443b51ac051a1f7f21e93b69",
+    "createdAt": "2026-08-27T02:43:57.953Z",
+    "updatedAt": "2026-08-27T02:43:57.953Z"
+  },
+  {
+    "id": "USR-1003",
+    "username": "admin2",
+    "name": "Zolam",
+    "email": "",
+    "role": "user",
+    "salt": "8e54334b761be852ff7e093135902619",
+    "passwordHash": "6516804b20d34d8d783753b6e5f67fff91732074e6f6ed178099189d9e1e3f420a9af01354c1c94e919c815b36b7968d11a1f55f94174c77977a38b89aea3a7c",
+    "createdAt": "2026-08-27T02:46:51.640Z",
+    "updatedAt": "2026-08-27T02:46:51.640Z"
+  }
+]

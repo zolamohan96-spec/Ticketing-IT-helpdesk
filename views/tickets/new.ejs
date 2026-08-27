@@ -1,0 +1,81 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1>Buat Tiket Baru <small>Laporkan kendala teknis atau permintaan bantuan</small></h1>
+    </section>
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="fa fa-pencil-square-o"></i> Detail Laporan Gangguan</span>
+        </div>
+        <div class="panel-body">
+          <form method="post" action="/tickets" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-8 form-group">
+                <label for="title">Judul Masalah / Kendala <span class="text-danger">*</span></label>
+                <input id="title" name="title" class="form-control" required placeholder="Contoh: Laptop tidak bisa terhubung ke Wi-Fi" autofocus>
+              </div>
+              <div class="col-md-4 form-group">
+                <label for="category">Kategori</label>
+                <select id="category" name="category" class="form-control">
+                  <% categories.forEach(category => { %>
+                    <option><%= category %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 form-group">
+                <label for="requester">Nama Pelapor <span class="text-danger">*</span></label>
+                <input id="requester" name="requester" class="form-control" value="<%= values.requester || (currentUser ? (currentUser.name || currentUser.username) : '') %>" required>
+              </div>
+              <div class="col-md-4 form-group">
+                <label for="email">Email / Kontak Notifikasi</label>
+                <input id="email" name="email" type="email" class="form-control" value="<%= values.email || (currentUser ? currentUser.email : '') %>" placeholder="nama@perusahaan.id">
+              </div>
+              <div class="col-md-4 form-group">
+                <label for="priority">Prioritas</label>
+                <select id="priority" name="priority" class="form-control">
+                  <% priorities.forEach(priority => { %>
+                    <option <%= priority === 'Medium' ? 'selected' : '' %>><%= priority %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Detail Masalah & Kronologi <span class="text-danger">*</span></label>
+              <textarea id="description" name="description" rows="6" class="form-control" required placeholder="Jelaskan gejala yang dialami, perangkat/aplikasi yang terdampak, waktu kejadian, dan pesan error jika ada."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="attachment">Lampiran Foto / Screenshot Error</label>
+              <input id="attachment" name="attachment" type="file" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif">
+              <p class="help-block">Opsional. Format JPG, PNG, WEBP, atau GIF, maksimal 5 MB.</p>
+            </div>
+
+            <div class="callout callout-info" style="margin-top: 15px; margin-bottom: 20px;">
+              <h4><i class="fa fa-info-circle"></i> Info Urutan Antrean</h4>
+              <p>Setelah tiket dikirim, tiket Anda akan secara otomatis masuk ke antrean layanan Helpdesk IT dan mendapatkan nomor urutan antrean secara real-time.</p>
+            </div>
+
+            <div class="form-actions">
+              <a href="/tickets" class="btn btn-default"><i class="fa fa-arrow-left"></i> Batal</a>
+              <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Kirim Tiket Laporan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

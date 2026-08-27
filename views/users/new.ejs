@@ -1,0 +1,103 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1>Tambah Pengguna Baru <small>Daftarkan akun dan tentukan hak akses</small></h1>
+    </section>
+
+    <section class="content">
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <i class="fa fa-exclamation-circle"></i> <%= error %>
+        </div>
+      <% } %>
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="panel-title"><i class="fa fa-user-plus"></i> Formulir Pengguna Baru</span>
+            </div>
+            <div class="panel-body">
+              <form method="post" action="/users">
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="username">Username <span class="text-danger">*</span></label>
+                    <input id="username" name="username" class="form-control" value="<%= values.username || '' %>" required placeholder="Contoh: budi_santoso" autofocus>
+                    <p class="help-block">Minimal 3 karakter, tanpa spasi (huruf, angka, titik, strip, underscore).</p>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="name">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input id="name" name="name" class="form-control" value="<%= values.name || '' %>" required placeholder="Contoh: Budi Santoso">
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="email">Alamat Email</label>
+                    <input id="email" name="email" type="email" class="form-control" value="<%= values.email || '' %>" placeholder="nama@perusahaan.id">
+                    <p class="help-block">Opsional untuk kontak notifikasi.</p>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="role">Peran (Role) <span class="text-danger">*</span></label>
+                    <select id="role" name="role" class="form-control" required>
+                      <option value="user" <%= values.role === 'user' ? 'selected' : '' %>>User (Pengguna Standar)</option>
+                      <option value="admin" <%= values.role === 'admin' ? 'selected' : '' %>>Admin (Administrator Sistem)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label for="password">Password <span class="text-danger">*</span></label>
+                    <input id="password" name="password" type="password" class="form-control" required placeholder="Minimal 6 karakter">
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="confirmPassword">Konfirmasi Password <span class="text-danger">*</span></label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" required placeholder="Ketik ulang password">
+                  </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 15px;">
+                  <a href="/users" class="btn btn-default"><i class="fa fa-arrow-left"></i> Batal</a>
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan Pengguna</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <span class="panel-title"><i class="fa fa-info-circle"></i> Panduan Peran Pengguna</span>
+            </div>
+            <div class="panel-body">
+              <h4><strong>Administrator (Admin)</strong></h4>
+              <p class="text-muted">Memiliki akses penuh ke seluruh fitur sistem, termasuk:</p>
+              <ul class="text-muted">
+                <li>Kelola seluruh tiket gangguan</li>
+                <li>Ubah status, prioritas, & penugasan</li>
+                <li><strong>Menambah & mengelola akun pengguna</strong></li>
+              </ul>
+
+              <hr>
+
+              <h4><strong>Pengguna (User)</strong></h4>
+              <p class="text-muted">Dikhususkan untuk operasional helpdesk:</p>
+              <ul class="text-muted">
+                <li>Melihat ringkasan dashboard</li>
+                <li>Membuat laporan tiket baru</li>
+                <li>Melihat progres dan riwayat tiket</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

@@ -1,0 +1,134 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1>Kelola Pengguna <small>Manajemen akun dan hak akses sistem</small></h1>
+    </section>
+
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="stat-card">
+            <i class="fa fa-users"></i>
+            <div class="stat-label">Total Pengguna</div>
+            <div class="stat-number"><%= stats.total %></div>
+            <a href="/users">Semua akun</a>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card">
+            <i class="fa fa-shield"></i>
+            <div class="stat-label">Administrator</div>
+            <div class="stat-number"><%= stats.adminCount %></div>
+            <a href="/users?role=admin">Filter admin</a>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card">
+            <i class="fa fa-user"></i>
+            <div class="stat-label">Pengguna Biasa</div>
+            <div class="stat-number"><%= stats.userCount %></div>
+            <a href="/users?role=user">Filter user</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="get" action="/users" class="row">
+            <div class="col-md-6 form-group">
+              <label for="q">Cari Pengguna</label>
+              <input id="q" name="q" value="<%= filters.q || '' %>" class="form-control" placeholder="Cari username, nama lengkap, atau email...">
+            </div>
+            <div class="col-md-3 form-group">
+              <label for="role">Peran (Role)</label>
+              <select id="role" name="role" class="form-control">
+                <option value="">Semua Peran</option>
+                <option value="admin" <%= filters.role === 'admin' ? 'selected' : '' %>>Administrator</option>
+                <option value="user" <%= filters.role === 'user' ? 'selected' : '' %>>User Biasa</option>
+              </select>
+            </div>
+            <div class="col-md-3 form-group filter-actions">
+              <label>&nbsp;</label>
+              <div>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Filter</button>
+                <a href="/users" class="btn btn-default">Reset</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="fa fa-list"></i> Daftar Pengguna (<%= users.length %>)</span>
+          <a href="/users/new" class="btn btn-primary btn-sm pull-right"><i class="fa fa-user-plus"></i> Tambah Pengguna</a>
+        </div>
+        <div class="panel-body table-responsive">
+          <% if (!users.length) { %>
+            <div class="empty-state">
+              <i class="fa fa-user-times"></i>
+              <p>Pengguna tidak ditemukan.</p>
+              <a href="/users/new" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah Pengguna Baru</a>
+            </div>
+          <% } else { %>
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Nama Lengkap</th>
+                  <th>Email</th>
+                  <th>Peran</th>
+                  <th>Tanggal Dibuat</th>
+                  <th class="text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% users.forEach(user => { %>
+                  <tr>
+                    <td><code><%= user.id %></code></td>
+                    <td>
+                      <strong><%= user.username %></strong>
+                      <% if (currentUser && currentUser.id === user.id) { %>
+                        <span class="label label-info" style="margin-left: 5px;">Akun Anda</span>
+                      <% } %>
+                    </td>
+                    <td><%= user.name %></td>
+                    <td><%= user.email || '-' %></td>
+                    <td>
+                      <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>">
+                        <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
+                        <%= user.role === 'admin' ? 'Administrator' : 'User' %>
+                      </span>
+                    </td>
+                    <td><%= new Date(user.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+                    <td class="text-right">
+                      <% if (user.username.toLowerCase() === 'admin') { %>
+                        <span class="text-muted" title="Akun admin utama tidak dapat dihapus"><i class="fa fa-lock"></i> Sistem</span>
+                      <% } else if (currentUser && currentUser.id === user.id) { %>
+                        <span class="text-muted" title="Tidak dapat menghapus akun sendiri yang aktif"><i class="fa fa-check"></i> Aktif</span>
+                      <% } else { %>
+                        <form method="post" action="/users/<%= user.id %>/delete" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna \'<%= user.username %>\'? Tindakan ini tidak dapat dibatalkan.');">
+                          <button type="submit" class="btn btn-danger btn-xs" title="Hapus Pengguna"><i class="fa fa-trash"></i> Hapus</button>
+                        </form>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

@@ -1,0 +1,60 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1><%= currentUser && currentUser.role === 'admin' ? 'Riwayat Terselesaikan' : 'Riwayat Tiket Saya' %> <small>Tiket yang telah selesai ditangani</small></h1>
+    </section>
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="fa fa-archive"></i> <%= tickets.length %> tiket terselesaikan</span>
+        </div>
+        <div class="panel-body table-responsive">
+          <% if (!tickets.length) { %>
+            <div class="empty-state">
+              <i class="fa fa-archive"></i>
+              <p>Belum ada tiket terselesaikan.</p>
+            </div>
+          <% } else { %>
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>Status Antrean</th>
+                  <th>ID</th>
+                  <th>Masalah</th>
+                  <th>Pelapor</th>
+                  <th>Kategori</th>
+                  <th>Status</th>
+                  <th>Prioritas</th>
+                  <th>Diperbarui</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% tickets.forEach(ticket => { %>
+                  <tr>
+                    <td><span class="badge badge-resolved"><i class="fa fa-check"></i> Selesai</span></td>
+                    <td><a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.id %></a></td>
+                    <td><a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.title %></a></td>
+                    <td><%= ticket.requester %></td>
+                    <td><%= ticket.category %></td>
+                    <td><span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span></td>
+                    <td><span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span></td>
+                    <td><%= new Date(ticket.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>

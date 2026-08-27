@@ -1,0 +1,117 @@
+<%- include ../templates/adminlte/header-top-nav.ejs %>
+<div class="content-wrapper">
+  <div class="container">
+    <section class="content-header">
+      <h1>Dashboard <small><%= currentUser && currentUser.role === 'admin' ? 'Ringkasan layanan bantuan IT & antrean' : 'Ringkasan tiket & status antrean Anda' %></small></h1>
+    </section>
+    <section class="content">
+      <% if (flashMessage) { %>
+        <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= flashMessage.text %>
+        </div>
+      <% } %>
+
+      <div class="ticket-welcome">
+        <h1>Selamat datang, <%= currentUser ? (currentUser.name || currentUser.username) : 'Pengguna' %>!</h1>
+        <p>
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            Panel Administrator: Kelola seluruh laporan tiket gangguan, pantau antrean penanganan, dan kelola akun pengguna.
+          <% } else { %>
+            Kelola laporan kendala IT Anda, pantau posisi urutan antrean tiket, dan cek status penyelesaian secara real-time.
+          <% } %>
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6 col-md-3">
+          <div class="stat-card">
+            <i class="fa fa-ticket"></i>
+            <div class="stat-label"><%= currentUser && currentUser.role === 'admin' ? 'Tiket aktif sistem' : 'Tiket aktif Anda' %></div>
+            <div class="stat-number"><%= stats.active %></div>
+            <a href="/tickets">Lihat semua</a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="stat-card">
+            <i class="fa fa-folder-open-o"></i>
+            <div class="stat-label">Tiket terbuka</div>
+            <div class="stat-number"><%= stats.open %></div>
+            <a href="/tickets?status=Open">Perlu ditangani</a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="stat-card">
+            <i class="fa fa-cog"></i>
+            <div class="stat-label">Sedang diproses</div>
+            <div class="stat-number"><%= stats.progress %></div>
+            <a href="/tickets?status=In%20Progress">Pantau progres</a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="stat-card">
+            <i class="fa fa-check-circle"></i>
+            <div class="stat-label">Terselesaikan</div>
+            <div class="stat-number"><%= stats.resolved %></div>
+            <a href="/tickets/history">Lihat riwayat</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="fa fa-clock-o"></i> <%= currentUser && currentUser.role === 'admin' ? 'Tiket aktif terbaru & antrean' : 'Tiket aktif & posisi antrean Anda' %></span>
+          <a href="/tickets/new" class="btn btn-primary btn-sm pull-right"><i class="fa fa-plus"></i> Buat tiket baru</a>
+        </div>
+        <div class="panel-body table-responsive">
+          <% if (!recent.length) { %>
+            <div class="empty-state">
+              <i class="fa fa-inbox"></i>
+              <p>Belum ada tiket aktif saat ini.</p>
+              <a href="/tickets/new" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Buat Laporan Baru</a>
+            </div>
+          <% } else { %>
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>No. Antrean</th>
+                  <th>ID</th>
+                  <th>Masalah</th>
+                  <th>Pelapor</th>
+                  <th>Status</th>
+                  <th>Prioritas</th>
+                  <th>Diperbarui</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recent.forEach(ticket => { %>
+                  <tr>
+                    <td>
+                      <% if (ticket.queuePosition) { %>
+                        <span class="badge badge-queue" title="Urutan ke-<%= ticket.queuePosition %> dalam antrean aktif">
+                          <i class="fa fa-list-ol"></i> Antrean #<%= ticket.queuePosition %>
+                        </span>
+                      <% } else { %>
+                        <span class="text-muted">-</span>
+                      <% } %>
+                    </td>
+                    <td><a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.id %></a></td>
+                    <td>
+                      <a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.title %></a>
+                      <div class="ticket-meta"><%= ticket.category %></div>
+                    </td>
+                    <td><%= ticket.requester %></td>
+                    <td><span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span></td>
+                    <td><span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span></td>
+                    <td><%= new Date(ticket.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<%- include ../templates/adminlte/footer.ejs %>
