@@ -2,14 +2,17 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title><%= (typeof title !== 'undefined' && title) ? title : (typeof locals !== 'undefined' && locals.title ? locals.title : 'Helpdesk Central') %> | Helpdesk Central</title>
   <link rel="stylesheet" href="/script-adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/script-adminlte/bower_components/font-awesome/css/font-awesome.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/script-adminlte/dist/css/AdminLTE.min.css" />
   <link rel="stylesheet" href="/script-adminlte/dist/css/skins/skin-blue.min.css" />
   <link rel="stylesheet" href="/css/ticketing.css" />
 </head>
-<body class="layout-top-nav skin-blue">
+<body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
   <%- include top-navigation.ejs %>
