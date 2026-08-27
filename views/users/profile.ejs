@@ -24,42 +24,19 @@
         </div>
       <% } %>
 
-      <div class="row">
-        <!-- Edit Profile Form -->
-        <div class="col-md-8">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <span class="panel-title"><i class="fa fa-user-circle"></i> Formulir Pembaruan Profil</span>
-            </div>
-            <div class="panel-body">
-              <form method="post" action="/profile" enctype="multipart/form-data">
-                
-                <!-- Avatar Upload Section -->
-                <div class="form-group" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                  <label style="display: block; margin-bottom: 10px; font-weight: 700; color: #0f172a;"><i class="fa fa-camera"></i> Foto Profil (Avatar)</label>
-                  <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
-                    <div style="position: relative;">
-                      <% if (user.avatar) { %>
-                        <img id="avatarPreview" src="<%= user.avatar %>" alt="Avatar" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid #0284c7; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                      <% } else { %>
-                        <div id="avatarFallback" style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #0b1329); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                          <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
-                        </div>
-                        <img id="avatarPreview" src="" alt="Avatar" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid #0284c7; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                      <% } %>
-                    </div>
-                    <div style="flex: 1; min-width: 200px;">
-                      <input type="file" id="avatarInput" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" style="margin-bottom: 6px;" onchange="previewAvatar(this)">
-                      <p class="help-block" style="margin-bottom: 4px; font-size: 12px;">Format: JPG, PNG, WEBP, atau GIF (Maksimal 5 MB).</p>
-                      <% if (user.avatar) { %>
-                        <label style="font-weight: normal; font-size: 12.5px; color: #dc2626; cursor: pointer; margin-top: 4px;">
-                          <input type="checkbox" name="removeAvatar" value="true"> Hapus foto profil saat ini (gunakan avatar bawaan)
-                        </label>
-                      <% } %>
-                    </div>
-                  </div>
-                </div>
+      <form method="post" action="/profile" id="profileForm" enctype="multipart/form-data">
+        <!-- Hidden file input triggered by clicking the avatar circle on the right card -->
+        <input type="file" id="avatarFileInput" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" onchange="handleAvatarSelected(this)">
+        <input type="hidden" id="removeAvatarInput" name="removeAvatar" value="false">
 
+        <div class="row">
+          <!-- Edit Profile Form (Left Column) -->
+          <div class="col-md-8">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="panel-title"><i class="fa fa-user-circle"></i> Formulir Pembaruan Profil</span>
+              </div>
+              <div class="panel-body">
                 <div class="row">
                   <div class="col-md-6 form-group">
                     <label for="username">Username</label>
@@ -117,78 +94,154 @@
 
                 <div class="form-actions" style="margin-top: 20px;">
                   <a href="/" class="btn btn-default"><i class="fa fa-arrow-left"></i> Kembali ke Dashboard</a>
-                  <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan Perubahan Profil</button>
+                  <button type="submit" class="btn btn-primary" id="saveProfileBtn"><i class="fa fa-save"></i> Simpan Perubahan Profil</button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Right Summary Box -->
-        <div class="col-md-4">
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <span class="panel-title"><i class="fa fa-id-card-o"></i> Ringkasan Akun</span>
-            </div>
-            <div class="panel-body text-center" style="padding-top: 25px;">
-              <div style="margin-bottom: 14px;">
-                <% if (user.avatar) { %>
-                  <img src="<%= user.avatar %>" alt="<%= user.name %>" style="width: 86px; height: 86px; border-radius: 50%; object-fit: cover; border: 3px solid #0284c7; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
-                <% } else { %>
-                  <div style="width: 86px; height: 86px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #0b1329); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 38px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
-                    <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
+          <!-- Right Summary & Interactive Avatar Card -->
+          <div class="col-md-4">
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <span class="panel-title"><i class="fa fa-id-card-o"></i> Ringkasan Akun</span>
+              </div>
+              <div class="panel-body text-center" style="padding-top: 22px;">
+                
+                <!-- Interactive Avatar Box -->
+                <div class="avatar-edit-container">
+                  <div class="avatar-circle-wrapper" onclick="triggerAvatarUpload()" title="Klik untuk mengunggah / mengubah foto profil">
+                    <% if (user.avatar) { %>
+                      <img id="summaryAvatarImg" src="<%= user.avatar %>" alt="<%= user.name %>" class="summary-avatar-img">
+                      <div id="summaryAvatarFallback" class="summary-avatar-fallback" style="display: none;">
+                        <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
+                      </div>
+                    <% } else { %>
+                      <div id="summaryAvatarFallback" class="summary-avatar-fallback">
+                        <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
+                      </div>
+                      <img id="summaryAvatarImg" src="" alt="<%= user.name %>" class="summary-avatar-img" style="display: none;">
+                    <% } %>
+                    
+                    <div class="avatar-camera-badge" title="Ubah Foto">
+                      <i class="fa fa-camera"></i>
+                    </div>
+                    <div class="avatar-hover-overlay">
+                      <i class="fa fa-camera"></i>
+                      <span>Ubah Foto</span>
+                    </div>
                   </div>
-                <% } %>
-              </div>
 
-              <h3 style="margin: 0 0 4px; font-weight: bold; color: #0f172a;"><%= user.name || user.username %></h3>
-              <p class="text-muted" style="margin-bottom: 10px;">@<%= user.username %></p>
-              
-              <div style="margin-bottom: 18px;">
-                <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>" style="font-size: 12px; padding: 4px 10px;">
-                  <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i> <%= user.role === 'admin' ? 'Administrator' : 'User Standar' %>
-                </span>
-              </div>
+                  <span class="avatar-click-hint" onclick="triggerAvatarUpload()">
+                    <i class="fa fa-camera"></i> Klik foto untuk mengubah
+                  </span>
 
-              <ul class="list-group list-group-unbordered text-left" style="font-size: 13px;">
-                <li class="list-group-item">
-                  <b>ID Pengguna</b> <span class="pull-right"><code><%= user.id %></code></span>
-                </li>
-                <li class="list-group-item">
-                  <b>Email</b> <span class="pull-right"><%= user.email || '-' %></span>
-                </li>
-                <li class="list-group-item">
-                  <b>Terdaftar Sejak</b> <span class="pull-right"><%= new Date(user.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium' }) %></span>
-                </li>
-              </ul>
+                  <!-- Status badge when new photo is selected -->
+                  <div id="avatarSelectedBadge" class="avatar-chosen-badge" style="display: none;">
+                    <i class="fa fa-check-circle"></i> Foto baru dipilih
+                  </div>
 
-              <div class="text-muted text-left" style="font-size: 12px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-                <i class="fa fa-lock text-success"></i> Terproteksi enkripsi salted PBKDF2 (SHA-512).
+                  <% if (user.avatar) { %>
+                    <button type="button" class="btn-remove-avatar" id="btnRemoveAvatar" onclick="removeCurrentAvatar()">
+                      <i class="fa fa-trash"></i> Hapus Foto Profil
+                    </button>
+                  <% } %>
+                </div>
+
+                <h3 style="margin: 0 0 4px; font-weight: bold; color: #0f172a;"><%= user.name || user.username %></h3>
+                <p class="text-muted" style="margin-bottom: 10px;">@<%= user.username %></p>
+                
+                <div style="margin-bottom: 18px;">
+                  <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>" style="font-size: 12px; padding: 4px 10px;">
+                    <i class="fa <%= user.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i> <%= user.role === 'admin' ? 'Administrator' : 'User Standar' %>
+                  </span>
+                </div>
+
+                <ul class="list-group list-group-unbordered text-left" style="font-size: 13px;">
+                  <li class="list-group-item">
+                    <b>ID Pengguna</b> <span class="pull-right"><code><%= user.id %></code></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Email</b> <span class="pull-right"><%= user.email || '-' %></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Terdaftar Sejak</b> <span class="pull-right"><%= new Date(user.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium' }) %></span>
+                  </li>
+                </ul>
+
+                <div class="text-muted text-left" style="font-size: 12px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                  <i class="fa fa-lock text-success"></i> Terproteksi enkripsi salted PBKDF2 (SHA-512).
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </section>
   </div>
 </div>
 
 <script>
-  function previewAvatar(input) {
+  function triggerAvatarUpload() {
+    document.getElementById('avatarFileInput').click();
+  }
+
+  function handleAvatarSelected(input) {
     if (input.files && input.files[0]) {
+      const file = input.files[0];
       const reader = new FileReader();
+      
       reader.onload = function(e) {
-        const preview = document.getElementById('avatarPreview');
-        const fallback = document.getElementById('avatarFallback');
-        if (preview) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
+        const img = document.getElementById('summaryAvatarImg');
+        const fallback = document.getElementById('summaryAvatarFallback');
+        const badge = document.getElementById('avatarSelectedBadge');
+        const removeBtn = document.getElementById('btnRemoveAvatar');
+        const removeInput = document.getElementById('removeAvatarInput');
+
+        if (img) {
+          img.src = e.target.result;
+          img.style.display = 'block';
         }
         if (fallback) {
           fallback.style.display = 'none';
         }
+        if (badge) {
+          badge.style.display = 'inline-flex';
+          badge.innerHTML = '<i class="fa fa-check-circle"></i> ' + (file.name.length > 18 ? file.name.substring(0, 15) + '...' : file.name);
+        }
+        if (removeInput) {
+          removeInput.value = 'false';
+        }
+        if (removeBtn) {
+          removeBtn.style.display = 'none';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function removeCurrentAvatar() {
+    if (confirm('Apakah Anda yakin ingin menghapus foto profil ini dan kembali ke avatar bawaan?')) {
+      const img = document.getElementById('summaryAvatarImg');
+      const fallback = document.getElementById('summaryAvatarFallback');
+      const removeInput = document.getElementById('removeAvatarInput');
+      const removeBtn = document.getElementById('btnRemoveAvatar');
+      const badge = document.getElementById('avatarSelectedBadge');
+      const fileInput = document.getElementById('avatarFileInput');
+
+      if (img) img.style.display = 'none';
+      if (fallback) fallback.style.display = 'flex';
+      if (removeInput) removeInput.value = 'true';
+      if (fileInput) fileInput.value = '';
+      if (removeBtn) removeBtn.style.display = 'none';
+      if (badge) {
+        badge.className = 'avatar-chosen-badge';
+        badge.style.background = '#fee2e2';
+        badge.style.borderColor = '#fca5a5';
+        badge.style.color = '#dc2626';
+        badge.style.display = 'inline-flex';
+        badge.innerHTML = '<i class="fa fa-info-circle"></i> Foto akan dihapus saat disimpan';
       }
-      reader.readAsDataURL(input.files[0]);
     }
   }
 </script>
