@@ -2,113 +2,303 @@
 <div class="content-wrapper">
   <div class="container">
     <section class="content-header">
-      <h1>Dashboard <small><%= currentUser && currentUser.role === 'admin' ? 'Ringkasan layanan bantuan IT & antrean' : 'Ringkasan tiket & status antrean Anda' %></small></h1>
+      <h1>Dashboard <small><%= currentUser && currentUser.role === 'admin' ? 'Pusat kendali layanan IT & antrean tiket' : 'Ringkasan tiket & status antrean Anda' %></small></h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
     </section>
+
     <section class="content">
       <% if (flashMessage) { %>
         <div class="alert alert-<%= flashMessage.type %> alert-dismissible">
           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          <%= flashMessage.text %>
+          <i class="fa <%= flashMessage.type === 'success' ? 'fa-check-circle' : 'fa-info-circle' %>"></i> <%= flashMessage.text %>
         </div>
       <% } %>
 
-      <div class="ticket-welcome">
-        <h1>Selamat datang, <%= currentUser ? (currentUser.name || currentUser.username) : 'Pengguna' %>!</h1>
-        <p>
-          <% if (currentUser && currentUser.role === 'admin') { %>
-            Panel Administrator: Kelola seluruh laporan tiket gangguan, pantau antrean penanganan, dan kelola akun pengguna.
-          <% } else { %>
-            Kelola laporan kendala IT Anda, pantau posisi urutan antrean tiket, dan cek status penyelesaian secara real-time.
-          <% } %>
-        </p>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-6 col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-ticket"></i>
-            <div class="stat-label"><%= currentUser && currentUser.role === 'admin' ? 'Tiket aktif sistem' : 'Tiket aktif Anda' %></div>
-            <div class="stat-number"><%= stats.active %></div>
-            <a href="/tickets">Lihat semua</a>
+      <!-- Modern Hero Welcome Banner -->
+      <div class="dash-hero-card">
+        <div class="dash-hero-left">
+          <div class="dash-avatar-wrapper">
+            <% if (currentUser && currentUser.avatar) { %>
+              <img src="<%= currentUser.avatar %>" alt="<%= currentUser.name %>" class="dash-avatar-img">
+            <% } else { %>
+              <div class="dash-avatar-fallback">
+                <i class="fa <%= currentUser && currentUser.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i>
+              </div>
+            <% } %>
           </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-folder-open-o"></i>
-            <div class="stat-label">Tiket terbuka</div>
-            <div class="stat-number"><%= stats.open %></div>
-            <a href="/tickets?status=Open">Perlu ditangani</a>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-cog"></i>
-            <div class="stat-label">Sedang diproses</div>
-            <div class="stat-number"><%= stats.progress %></div>
-            <a href="/tickets?status=In%20Progress">Pantau progres</a>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-check-circle"></i>
-            <div class="stat-label">Terselesaikan</div>
-            <div class="stat-number"><%= stats.resolved %></div>
-            <a href="/tickets/history">Lihat riwayat</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="panel-title"><i class="fa fa-clock-o"></i> <%= currentUser && currentUser.role === 'admin' ? 'Tiket aktif terbaru & antrean' : 'Tiket aktif & posisi antrean Anda' %></span>
-          <a href="/tickets/new" class="btn btn-primary btn-sm pull-right"><i class="fa fa-plus"></i> Buat tiket baru</a>
-        </div>
-        <div class="panel-body table-responsive">
-          <% if (!recent.length) { %>
-            <div class="empty-state">
-              <i class="fa fa-inbox"></i>
-              <p>Belum ada tiket aktif saat ini.</p>
-              <a href="/tickets/new" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Buat Laporan Baru</a>
+          <div class="dash-hero-text">
+            <h2>
+              Selamat datang, <%= currentUser ? (currentUser.name || currentUser.username) : 'Pengguna' %>!
+              <span class="badge <%= currentUser && currentUser.role === 'admin' ? 'badge-admin' : 'badge-user' %>" style="font-size: 11.5px; padding: 4px 10px;">
+                <i class="fa <%= currentUser && currentUser.role === 'admin' ? 'fa-shield' : 'fa-user' %>"></i> <%= currentUser && currentUser.role === 'admin' ? 'Administrator' : 'Pengguna' %>
+              </span>
+            </h2>
+            <p>
+              <% if (currentUser && currentUser.role === 'admin') { %>
+                Panel kendali operasional IT Helpdesk: kelola laporan gangguan, pantau antrean penanganan FIFO, dan atur akun pengguna.
+              <% } else { %>
+                Pantau proses penanganan kendala IT Anda, cek posisi nomor antrean secara real-time, dan ajukan laporan tiket baru.
+              <% } %>
+            </p>
+            <div class="dash-chips-row">
+              <span class="dash-chip"><i class="fa fa-calendar"></i> <%= new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+              <span class="dash-chip"><i class="fa fa-clock-o text-success"></i> Sistem Antrean Online Aktif</span>
             </div>
-          <% } else { %>
-            <table class="table table-hover table-striped">
-              <thead>
-                <tr>
-                  <th>No. Antrean</th>
-                  <th>ID</th>
-                  <th>Masalah</th>
-                  <th>Pelapor</th>
-                  <th>Status</th>
-                  <th>Prioritas</th>
-                  <th>Diperbarui</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% recent.forEach(ticket => { %>
-                  <tr>
-                    <td>
-                      <% if (ticket.queuePosition) { %>
-                        <span class="badge badge-queue" title="Urutan ke-<%= ticket.queuePosition %> dalam antrean aktif">
-                          <i class="fa fa-list-ol"></i> Antrean #<%= ticket.queuePosition %>
-                        </span>
-                      <% } else { %>
-                        <span class="text-muted">-</span>
+          </div>
+        </div>
+
+        <div class="dash-hero-actions">
+          <a href="/tickets/new" class="btn-dash-primary">
+            <i class="fa fa-plus"></i> Buat Tiket Baru
+          </a>
+          <a href="/tickets" class="btn-dash-outline">
+            <i class="fa fa-ticket"></i> Semua Tiket
+          </a>
+        </div>
+      </div>
+
+      <!-- Modern Metric Stat Cards (4 Cards) -->
+      <div class="dash-stat-grid">
+        <!-- 1. Active Tickets -->
+        <div class="modern-stat-card">
+          <div>
+            <div class="stat-card-top">
+              <div>
+                <div class="stat-card-number"><%= stats.active %></div>
+                <div class="stat-card-label"><%= currentUser && currentUser.role === 'admin' ? 'Tiket Aktif Sistem' : 'Tiket Aktif Anda' %></div>
+              </div>
+              <div class="stat-card-icon icon-active">
+                <i class="fa fa-ticket"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/tickets" class="stat-card-link link-active">
+            <span>Lihat semua aktif</span> <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- 2. Open / Waiting Queue -->
+        <div class="modern-stat-card">
+          <div>
+            <div class="stat-card-top">
+              <div>
+                <div class="stat-card-number"><%= stats.open %></div>
+                <div class="stat-card-label">Menunggu Antrean (Open)</div>
+              </div>
+              <div class="stat-card-icon icon-open">
+                <i class="fa fa-folder-open-o"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/tickets?status=Open" class="stat-card-link link-open">
+            <span>Perlu ditangani</span> <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- 3. In Progress -->
+        <div class="modern-stat-card">
+          <div>
+            <div class="stat-card-top">
+              <div>
+                <div class="stat-card-number"><%= stats.progress %></div>
+                <div class="stat-card-label">Sedang Dikerjakan</div>
+              </div>
+              <div class="stat-card-icon icon-progress">
+                <i class="fa fa-cogs"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/tickets?status=In%20Progress" class="stat-card-link link-progress">
+            <span>Pantau progres</span> <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- 4. Resolved -->
+        <div class="modern-stat-card">
+          <div>
+            <div class="stat-card-top">
+              <div>
+                <div class="stat-card-number"><%= stats.resolved %></div>
+                <div class="stat-card-label">Selesai (Resolved)</div>
+              </div>
+              <div class="stat-card-icon icon-resolved">
+                <i class="fa fa-check-circle"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/tickets/history" class="stat-card-link link-resolved">
+            <span>Lihat riwayat arsip</span> <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Content Split (8 cols Table + 4 cols Widgets) -->
+      <div class="row">
+        <!-- Left Table: Recent Active Tickets -->
+        <div class="col-md-8">
+          <div class="dash-panel">
+            <div class="dash-panel-header">
+              <h3 class="dash-panel-title">
+                <i class="fa fa-list-ol"></i>
+                <%= currentUser && currentUser.role === 'admin' ? 'Daftar Antrean Tiket Aktif' : 'Tiket Aktif & Urutan Antrean Anda' %>
+              </h3>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="/tickets" class="btn btn-default btn-xs" style="font-weight: 600;">Lihat Semua (<%= recent.length %>)</a>
+                <a href="/tickets/new" class="btn btn-primary btn-xs" style="font-weight: 600;"><i class="fa fa-plus"></i> Baru</a>
+              </div>
+            </div>
+            
+            <div class="table-responsive" style="margin: 0;">
+              <% if (!recent.length) { %>
+                <div class="empty-state" style="padding: 40px 20px;">
+                  <div style="width: 60px; height: 60px; border-radius: 50%; background: #f0fdf4; color: #16a34a; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 12px;">
+                    <i class="fa fa-check"></i>
+                  </div>
+                  <h4 style="font-weight: 700; color: #0f172a; margin-top: 0;">Tidak Ada Antrean Tiket Aktif</h4>
+                  <p style="color: #64748b; font-size: 13px; margin-bottom: 15px;">Semua tiket telah terselesaikan atau belum ada laporan baru saat ini.</p>
+                  <a href="/tickets/new" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Buat Laporan Baru</a>
+                </div>
+              <% } else { %>
+                <table class="table table-hover" style="margin-bottom: 0;">
+                  <thead style="background: #f8fafc;">
+                    <tr>
+                      <th style="width: 125px;">No. Antrean</th>
+                      <th>Masalah / Subjek</th>
+                      <% if (currentUser && currentUser.role === 'admin') { %>
+                        <th>Pelapor</th>
                       <% } %>
-                    </td>
-                    <td><a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.id %></a></td>
-                    <td>
-                      <a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.title %></a>
-                      <div class="ticket-meta"><%= ticket.category %></div>
-                    </td>
-                    <td><%= ticket.requester %></td>
-                    <td><span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span></td>
-                    <td><span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span></td>
-                    <td><%= new Date(ticket.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
-                  </tr>
-                <% }) %>
-              </tbody>
-            </table>
-          <% } %>
+                      <th>Status</th>
+                      <th>Prioritas</th>
+                      <th class="text-right" style="width: 80px;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% recent.forEach(ticket => { %>
+                      <tr>
+                        <td style="vertical-align: middle;">
+                          <% if (ticket.queuePosition) { %>
+                            <span class="badge badge-queue" title="Urutan ke-<%= ticket.queuePosition %> dalam antrean aktif">
+                              <i class="fa fa-list-ol"></i> #<%= ticket.queuePosition %>
+                            </span>
+                          <% } else { %>
+                            <span class="badge badge-resolved"><i class="fa fa-check"></i> Siap</span>
+                          <% } %>
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <div style="font-weight: 700;">
+                            <a class="ticket-link" href="/tickets/<%= ticket.id %>"><%= ticket.title %></a>
+                          </div>
+                          <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
+                            <span style="font-weight: 600; color: #0369a1;"><code><%= ticket.id %></code></span> &bull; <%= ticket.category %>
+                          </div>
+                        </td>
+                        <% if (currentUser && currentUser.role === 'admin') { %>
+                          <td style="vertical-align: middle; font-size: 13px; color: #334155;">
+                            <i class="fa fa-user-circle text-muted" style="margin-right: 3px;"></i> <%= ticket.requester %>
+                          </td>
+                        <% } %>
+                        <td style="vertical-align: middle;">
+                          <span class="badge-status status-<%= ticket.status.toLowerCase().replace(/ /g, '-') %>"><%= ticket.status %></span>
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span class="badge-priority priority-<%= ticket.priority.toLowerCase() %>"><%= ticket.priority %></span>
+                        </td>
+                        <td class="text-right" style="vertical-align: middle;">
+                          <a href="/tickets/<%= ticket.id %>" class="btn btn-default btn-xs" style="font-weight: 600;" title="Buka Detail Tiket">
+                            Detail <i class="fa fa-chevron-right" style="font-size: 10px;"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Widgets -->
+        <div class="col-md-4">
+          <!-- Widget 1: Quick Actions -->
+          <div class="dash-panel">
+            <div class="dash-panel-header">
+              <h3 class="dash-panel-title"><i class="fa fa-bolt"></i> Akses &amp; Tindakan Cepat</h3>
+            </div>
+            <div style="padding: 16px;">
+              <a href="/tickets/new" class="quick-action-item">
+                <div class="quick-action-icon" style="background: #e0f2fe; color: #0284c7;">
+                  <i class="fa fa-plus-circle"></i>
+                </div>
+                <div class="quick-action-info">
+                  <strong>Buat Tiket Gangguan</strong>
+                  <span>Laporkan kendala IT &amp; dapatkan antrean</span>
+                </div>
+              </a>
+
+              <a href="/profile" class="quick-action-item">
+                <div class="quick-action-icon" style="background: #f0fdf4; color: #16a34a;">
+                  <i class="fa fa-user"></i>
+                </div>
+                <div class="quick-action-info">
+                  <strong>Profil Saya &amp; Foto</strong>
+                  <span>Ubah avatar, kontak &amp; ganti password</span>
+                </div>
+              </a>
+
+              <% if (currentUser && currentUser.role === 'admin') { %>
+                <a href="/users" class="quick-action-item">
+                  <div class="quick-action-icon" style="background: #fef2f2; color: #ef4444;">
+                    <i class="fa fa-users"></i>
+                  </div>
+                  <div class="quick-action-info">
+                    <strong>Kelola Pengguna</strong>
+                    <span>Tambah, edit peran &amp; akun pengguna</span>
+                  </div>
+                </a>
+              <% } %>
+
+              <a href="/download/apk" class="quick-action-item">
+                <div class="quick-action-icon" style="background: #ecfdf5; color: #059669;">
+                  <i class="fa fa-android"></i>
+                </div>
+                <div class="quick-action-info">
+                  <strong>Unduh Aplikasi Android</strong>
+                  <span>Akses Helpdesk Central dari HP (.APK)</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Widget 2: Helpdesk Service Info -->
+          <div class="dash-panel">
+            <div class="dash-panel-header">
+              <h3 class="dash-panel-title"><i class="fa fa-info-circle"></i> Informasi Antrean &amp; Layanan</h3>
+            </div>
+            <div style="padding: 16px; font-size: 13px; color: #334155;">
+              <div style="display: flex; gap: 12px; margin-bottom: 14px;">
+                <div style="font-size: 20px; color: #0284c7;"><i class="fa fa-sort-numeric-asc"></i></div>
+                <div>
+                  <strong style="color: #0f172a; display: block; margin-bottom: 2px;">Sistem Antrean FIFO</strong>
+                  <span>Setiap tiket yang masuk akan diproses berurutan sesuai waktu pelaporan (First-In, First-Out).</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                <div style="font-size: 20px; color: #16a34a;"><i class="fa fa-clock-o"></i></div>
+                <div>
+                  <strong style="color: #0f172a; display: block; margin-bottom: 2px;">Jam Operasional IT Support</strong>
+                  <span>Senin &ndash; Jumat: 08.00 &ndash; 17.00 WIB</span>
+                </div>
+              </div>
+
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 12px; color: #64748b;">
+                <i class="fa fa-shield text-primary"></i> Hubungi tim Helpdesk Central jika terjadi kendala operasional darurat.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
