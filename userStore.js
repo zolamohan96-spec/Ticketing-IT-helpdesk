@@ -241,6 +241,54 @@ const userStore = {
     return safeUser(targetUser);
   },
 
+  updateProfile(id, input) {
+    const users = read();
+    const targetIndex = users.findIndex(u => u.id === id);
+    if (targetIndex === -1) {
+      throw new Error('Pengguna tidak ditemukan.');
+    }
+
+    const targetUser = users[targetIndex];
+    const name = (input.name || '').trim();
+    const email = (input.email || '').trim();
+    const oldPassword = input.oldPassword;
+    const newPassword = input.newPassword;
+
+    if (!name) {
+      throw new Error('Nama lengkap wajib diisi.');
+    }
+
+    // If new password is provided, verify old password
+    if (newPassword && newPassword.trim()) {
+      if (!oldPassword) {
+        throw new Error('Password saat ini (lama) wajib diisi untuk mengganti password.');
+      }
+      const testHash = hashPassword(oldPassword, targetUser.salt);
+      const hashBuffer = Buffer.from(targetUser.passwordHash, 'hex');
+      const testBuffer = Buffer.from(testHash, 'hex');
+
+      if (hashBuffer.length !== testBuffer.length || !crypto.timingSafeEqual(hashBuffer, testBuffer)) {
+        throw new Error('Password saat ini (lama) salah.');
+      }
+
+      if (newPassword.length < 6) {
+        throw new Error('Password baru minimal 6 karakter.');
+      }
+
+      const newSalt = generateSalt();
+      targetUser.salt = newSalt;
+      targetUser.passwordHash = hashPassword(newPassword, newSalt);
+    }
+
+    targetUser.name = name;
+    targetUser.email = email;
+    targetUser.updatedAt = now();
+
+    users[targetIndex] = targetUser;
+    write(users);
+    return safeUser(targetUser);
+  },
+
   stats() {
     const users = read();
     return {

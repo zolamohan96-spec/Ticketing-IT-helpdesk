@@ -76,6 +76,67 @@ router.post('/auth/login', (req, res) => {
 
 router.post('/auth/logout', (req, res) => req.session.destroy(() => res.redirect('/login')));
 
+// User Own Profile Routes (Accessible by all logged in users)
+router.get('/profile', (req, res) => {
+  const currentUser = req.session.user;
+  const user = userStore.find(currentUser.id);
+  if (!user) {
+    req.flash('message', { type: 'danger', text: 'Data profil pengguna tidak ditemukan.' });
+    return res.redirect('/');
+  }
+  res.render('users/profile', {
+    title: 'Profil Saya',
+    user,
+    values: user,
+    error: null
+  });
+});
+
+router.post('/profile', (req, res) => {
+  const currentUser = req.session.user;
+  const user = userStore.find(currentUser.id);
+  if (!user) {
+    req.flash('message', { type: 'danger', text: 'Data profil pengguna tidak ditemukan.' });
+    return res.redirect('/');
+  }
+
+  const { name, email, oldPassword, newPassword, confirmPassword } = req.body;
+
+  if (newPassword && newPassword !== confirmPassword) {
+    return res.status(400).render('users/profile', {
+      title: 'Profil Saya',
+      user,
+      values: { ...user, name, email },
+      error: 'Konfirmasi password baru tidak cocok.'
+    });
+  }
+
+  try {
+    const updated = userStore.updateProfile(currentUser.id, {
+      name,
+      email,
+      oldPassword,
+      newPassword
+    });
+
+    req.session.user.name = updated.name;
+    req.session.user.email = updated.email;
+
+    req.flash('message', {
+      type: 'success',
+      text: 'Profil dan password Anda berhasil diperbarui.'
+    });
+    res.redirect('/profile');
+  } catch (err) {
+    res.status(400).render('users/profile', {
+      title: 'Profil Saya',
+      user,
+      values: { ...user, name, email },
+      error: err.message
+    });
+  }
+});
+
 // User Management Routes (Admin Only)
 router.get('/users', requireAdmin, (req, res) => {
   const users = userStore.all(req.query);

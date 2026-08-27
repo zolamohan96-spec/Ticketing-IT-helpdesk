@@ -23,13 +23,13 @@
   },
   {
     "id": "USR-1003",
-    "username": "admin2",
-    "name": "Zolam",
-    "email": "",
+    "username": "User2",
+    "name": "Gyandara",
+    "email": "Gyandara@mail.com",
     "role": "user",
-    "salt": "8e54334b761be852ff7e093135902619",
-    "passwordHash": "6516804b20d34d8d783753b6e5f67fff91732074e6f6ed178099189d9e1e3f420a9af01354c1c94e919c815b36b7968d11a1f55f94174c77977a38b89aea3a7c",
-    "createdAt": "2026-08-27T02:46:51.640Z",
-    "updatedAt": "2026-08-27T02:46:51.640Z"
+    "salt": "771c9c69873c1f3817ef92387493d04b",
+    "passwordHash": "7fc85feaca7d20d252a66c2401bc3f052b2934aa56631e4d2a04cc4676d5d9502faeb20bbea41295a70ca36d4c2a99306f477396e0d58513cbd1ca02e18715c5",
+    "createdAt": "2026-08-27T08:23:19.936Z",
+    "updatedAt": "2026-08-27T08:23:19.936Z"
   }
 ]
