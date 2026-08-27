@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "HelpdeskPrefs";
     private static final String KEY_SERVER_URL = "server_url";
-    private static final String DEFAULT_SERVER_URL = "http://192.168.18.123:3300";
+    private static final String DEFAULT_SERVER_URL = "http://192.168.18.123:3000";
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
