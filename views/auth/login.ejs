@@ -82,15 +82,6 @@
           </div>
         <% } %>
 
-        <!-- Last Used User Banner (Populated via JS) -->
-        <div id="lastUserBanner" class="last-user-badge" style="display: none;">
-          <div class="last-user-left">
-            <i class="fa fa-history"></i>
-            <span>Akun terakhir: <strong id="lastUserName">user</strong></span>
-          </div>
-          <button type="button" class="btn-use-last" onclick="useLastUser()">Gunakan</button>
-        </div>
-
         <form method="post" action="/auth/login" id="loginForm" class="auth-form" onsubmit="saveLastUser()">
           <input type="hidden" name="next" value="<%= next || '/' %>">
 
@@ -123,33 +114,35 @@
 
         <!-- Divider -->
         <div class="auth-divider">
-          <span>AKSES CEPAT KREDENSIAL</span>
+          <span>AKSES CEPAT PENGGUNA TERAKHIR</span>
         </div>
 
-        <!-- Quick Demo Credentials (Passwords Masked) -->
-        <div class="demo-creds-container">
-          <div class="demo-card demo-card-admin" id="cardAdmin" onclick="applyCreds('admin', 'Admin@12345', this)">
+        <!-- Single Last Used User Card -->
+        <div class="last-user-card-wrapper">
+          <div class="demo-card demo-card-single" id="singleLastCard" onclick="applyLastUser()">
             <div class="demo-card-top">
-              <span class="role-tag role-tag-admin"><i class="fa fa-shield"></i> Admin</span>
-              <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
+              <span class="role-tag" id="lastRoleTag"><i class="fa fa-user" id="lastRoleIcon"></i> <span id="lastRoleLabel">User</span></span>
+              <span class="use-pill"><i class="fa fa-bolt"></i> Masuk Cepat</span>
             </div>
             <div class="demo-card-body">
-              <div class="cred-row"><span>User:</span> <code>admin</code></div>
-              <div class="cred-row"><span>Pass:</span> <code class="pass-masked">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code></div>
+              <div class="cred-row">
+                <span>Pengguna Terakhir:</span>
+                <strong id="lastUsernameDisplay" style="color: #0f172a; font-size: 13px;">user</strong>
+              </div>
+              <div class="cred-row">
+                <span>Kata Sandi:</span>
+                <code class="pass-masked">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code>
+              </div>
             </div>
-            <div class="demo-card-bottom">Kelola tiket, antrean &amp; user</div>
+            <div class="demo-card-bottom" id="lastDescDisplay">
+              Klik untuk mengisi data akun terakhir ini
+            </div>
           </div>
-
-          <div class="demo-card demo-card-user" id="cardUser" onclick="applyCreds('user', 'User@12345', this)">
-            <div class="demo-card-top">
-              <span class="role-tag role-tag-user"><i class="fa fa-user"></i> User</span>
-              <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
-            </div>
-            <div class="demo-card-body">
-              <div class="cred-row"><span>User:</span> <code>user</code></div>
-              <div class="cred-row"><span>Pass:</span> <code class="pass-masked">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code></div>
-            </div>
-            <div class="demo-card-bottom">Buat laporan &amp; cek antrean</div>
+          
+          <div class="switch-user-row">
+            <button type="button" class="btn-switch-account" onclick="switchDefaultUser()" id="btnSwitchAccount">
+              <i class="fa fa-refresh"></i> Ganti ke akun <span id="switchTargetName">Admin</span>
+            </button>
           </div>
         </div>
 
@@ -170,76 +163,83 @@
     const STORAGE_KEY_LAST_USER = 'helpdesk_last_username';
     const STORAGE_KEY_LAST_ROLE = 'helpdesk_last_role';
 
-    // On page load, check for last used user
+    // Predefined credentials mapping
+    const KNOWN_CREDS = {
+      'admin': { pass: 'Admin@12345', role: 'admin', roleLabel: 'Admin', icon: 'fa-shield', desc: 'Hak akses Administrator penuh' },
+      'user': { pass: 'User@12345', role: 'user', roleLabel: 'User', icon: 'fa-user', desc: 'Hak akses Pengguna Helpdesk' }
+    };
+
+    function updateSingleCard(username) {
+      const u = (username || 'user').toLowerCase();
+      const card = document.getElementById('singleLastCard');
+      const roleTag = document.getElementById('lastRoleTag');
+      const roleIcon = document.getElementById('lastRoleIcon');
+      const roleLabel = document.getElementById('lastRoleLabel');
+      const userDisplay = document.getElementById('lastUsernameDisplay');
+      const descDisplay = document.getElementById('lastDescDisplay');
+      const switchTarget = document.getElementById('switchTargetName');
+
+      userDisplay.textContent = username;
+
+      if (u === 'admin') {
+        card.className = 'demo-card demo-card-single demo-card-admin';
+        roleTag.className = 'role-tag role-tag-admin';
+        roleIcon.className = 'fa fa-shield';
+        roleLabel.textContent = 'Admin';
+        descDisplay.textContent = 'Hak akses Administrator (Kelola tiket & user)';
+        if (switchTarget) switchTarget.textContent = 'User';
+      } else {
+        card.className = 'demo-card demo-card-single demo-card-user';
+        roleTag.className = 'role-tag role-tag-user';
+        roleIcon.className = 'fa fa-user';
+        roleLabel.textContent = 'User';
+        descDisplay.textContent = 'Hak akses Pengguna (Laporan & antrean tiket)';
+        if (switchTarget) switchTarget.textContent = 'Admin';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-      const lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER);
-      if (lastUsername) {
-        const lastBanner = document.getElementById('lastUserBanner');
-        const lastNameElem = document.getElementById('lastUserName');
-        if (lastBanner && lastNameElem) {
-          lastNameElem.textContent = lastUsername;
-          lastBanner.style.display = 'flex';
-        }
+      let lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER);
+      if (!lastUsername) {
+        lastUsername = 'user'; // default initial last user
+      }
 
-        const uInput = document.getElementById('usernameInput');
-        if (uInput && !uInput.value) {
-          uInput.value = lastUsername;
-          const pInput = document.getElementById('passwordInput');
-          if (pInput) pInput.focus();
-        }
+      updateSingleCard(lastUsername);
 
-        // Highlight matching card if admin or user
-        if (lastUsername.toLowerCase() === 'admin') {
-          const c = document.getElementById('cardAdmin');
-          if (c) c.classList.add('active-demo-card');
-        } else if (lastUsername.toLowerCase() === 'user') {
-          const c = document.getElementById('cardUser');
-          if (c) c.classList.add('active-demo-card');
-        }
+      const uInput = document.getElementById('usernameInput');
+      if (uInput && !uInput.value) {
+        uInput.value = lastUsername;
+        const pInput = document.getElementById('passwordInput');
+        if (pInput) pInput.focus();
       }
     });
 
     function saveLastUser() {
       const uInput = document.getElementById('usernameInput');
       if (uInput && uInput.value.trim()) {
-        localStorage.setItem(STORAGE_KEY_LAST_USER, uInput.value.trim());
+        const val = uInput.value.trim();
+        localStorage.setItem(STORAGE_KEY_LAST_USER, val);
       }
     }
 
-    function useLastUser() {
-      const lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER);
-      if (lastUsername) {
-        const uInput = document.getElementById('usernameInput');
-        const pInput = document.getElementById('passwordInput');
-        uInput.value = lastUsername;
-        
-        if (lastUsername.toLowerCase() === 'admin') {
-          pInput.value = 'Admin@12345';
-        } else if (lastUsername.toLowerCase() === 'user') {
-          pInput.value = 'User@12345';
-        } else {
-          pInput.value = '';
-          pInput.focus();
-        }
-
-        uInput.classList.add('highlight-pulse');
-        setTimeout(() => uInput.classList.remove('highlight-pulse'), 400);
-        document.getElementById('submitBtn').focus();
-      }
-    }
-
-    function applyCreds(username, password, cardElem) {
+    function applyLastUser() {
+      let lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER) || 'user';
       const uInput = document.getElementById('usernameInput');
       const pInput = document.getElementById('passwordInput');
       
-      uInput.value = username;
-      pInput.value = password;
+      uInput.value = lastUsername;
       
-      localStorage.setItem(STORAGE_KEY_LAST_USER, username);
-      
-      document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active-demo-card'));
-      if (cardElem) cardElem.classList.add('active-demo-card');
-      
+      const key = lastUsername.toLowerCase();
+      if (KNOWN_CREDS[key]) {
+        pInput.value = KNOWN_CREDS[key].pass;
+      } else {
+        pInput.value = '';
+        pInput.focus();
+      }
+
+      const card = document.getElementById('singleLastCard');
+      if (card) card.classList.add('active-demo-card');
+
       uInput.classList.add('highlight-pulse');
       pInput.classList.add('highlight-pulse');
       setTimeout(() => {
@@ -248,6 +248,15 @@
       }, 400);
 
       document.getElementById('submitBtn').focus();
+    }
+
+    function switchDefaultUser() {
+      let current = localStorage.getItem(STORAGE_KEY_LAST_USER) || 'user';
+      let nextUser = (current.toLowerCase() === 'admin') ? 'user' : 'admin';
+      
+      localStorage.setItem(STORAGE_KEY_LAST_USER, nextUser);
+      updateSingleCard(nextUser);
+      applyLastUser();
     }
 
     function togglePasswordVisibility() {
