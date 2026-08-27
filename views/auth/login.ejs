@@ -82,7 +82,16 @@
           </div>
         <% } %>
 
-        <form method="post" action="/auth/login" id="loginForm" class="auth-form">
+        <!-- Last Used User Banner (Populated via JS) -->
+        <div id="lastUserBanner" class="last-user-badge" style="display: none;">
+          <div class="last-user-left">
+            <i class="fa fa-history"></i>
+            <span>Akun terakhir: <strong id="lastUserName">user</strong></span>
+          </div>
+          <button type="button" class="btn-use-last" onclick="useLastUser()">Gunakan</button>
+        </div>
+
+        <form method="post" action="/auth/login" id="loginForm" class="auth-form" onsubmit="saveLastUser()">
           <input type="hidden" name="next" value="<%= next || '/' %>">
 
           <div class="auth-field-group">
@@ -117,30 +126,30 @@
           <span>AKSES CEPAT KREDENSIAL</span>
         </div>
 
-        <!-- Quick Demo Credentials -->
+        <!-- Quick Demo Credentials (Passwords Masked) -->
         <div class="demo-creds-container">
-          <div class="demo-card demo-card-admin" onclick="applyCreds('admin', 'Admin@12345', this)">
+          <div class="demo-card demo-card-admin" id="cardAdmin" onclick="applyCreds('admin', 'Admin@12345', this)">
             <div class="demo-card-top">
               <span class="role-tag role-tag-admin"><i class="fa fa-shield"></i> Admin</span>
               <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
             </div>
             <div class="demo-card-body">
               <div class="cred-row"><span>User:</span> <code>admin</code></div>
-              <div class="cred-row"><span>Pass:</span> <code>Admin@12345</code></div>
+              <div class="cred-row"><span>Pass:</span> <code class="pass-masked">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code></div>
             </div>
-            <div class="demo-card-bottom">Kelola tiket, antrean &amp; tambah user</div>
+            <div class="demo-card-bottom">Kelola tiket, antrean &amp; user</div>
           </div>
 
-          <div class="demo-card demo-card-user" onclick="applyCreds('user', 'User@12345', this)">
+          <div class="demo-card demo-card-user" id="cardUser" onclick="applyCreds('user', 'User@12345', this)">
             <div class="demo-card-top">
               <span class="role-tag role-tag-user"><i class="fa fa-user"></i> User</span>
               <span class="use-pill"><i class="fa fa-check"></i> Gunakan</span>
             </div>
             <div class="demo-card-body">
               <div class="cred-row"><span>User:</span> <code>user</code></div>
-              <div class="cred-row"><span>Pass:</span> <code>User@12345</code></div>
+              <div class="cred-row"><span>Pass:</span> <code class="pass-masked">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code></div>
             </div>
-            <div class="demo-card-bottom">Buat laporan &amp; cek status tiket</div>
+            <div class="demo-card-bottom">Buat laporan &amp; cek antrean</div>
           </div>
         </div>
 
@@ -158,12 +167,75 @@
   </div>
 
   <script>
+    const STORAGE_KEY_LAST_USER = 'helpdesk_last_username';
+    const STORAGE_KEY_LAST_ROLE = 'helpdesk_last_role';
+
+    // On page load, check for last used user
+    document.addEventListener('DOMContentLoaded', function() {
+      const lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER);
+      if (lastUsername) {
+        const lastBanner = document.getElementById('lastUserBanner');
+        const lastNameElem = document.getElementById('lastUserName');
+        if (lastBanner && lastNameElem) {
+          lastNameElem.textContent = lastUsername;
+          lastBanner.style.display = 'flex';
+        }
+
+        const uInput = document.getElementById('usernameInput');
+        if (uInput && !uInput.value) {
+          uInput.value = lastUsername;
+          const pInput = document.getElementById('passwordInput');
+          if (pInput) pInput.focus();
+        }
+
+        // Highlight matching card if admin or user
+        if (lastUsername.toLowerCase() === 'admin') {
+          const c = document.getElementById('cardAdmin');
+          if (c) c.classList.add('active-demo-card');
+        } else if (lastUsername.toLowerCase() === 'user') {
+          const c = document.getElementById('cardUser');
+          if (c) c.classList.add('active-demo-card');
+        }
+      }
+    });
+
+    function saveLastUser() {
+      const uInput = document.getElementById('usernameInput');
+      if (uInput && uInput.value.trim()) {
+        localStorage.setItem(STORAGE_KEY_LAST_USER, uInput.value.trim());
+      }
+    }
+
+    function useLastUser() {
+      const lastUsername = localStorage.getItem(STORAGE_KEY_LAST_USER);
+      if (lastUsername) {
+        const uInput = document.getElementById('usernameInput');
+        const pInput = document.getElementById('passwordInput');
+        uInput.value = lastUsername;
+        
+        if (lastUsername.toLowerCase() === 'admin') {
+          pInput.value = 'Admin@12345';
+        } else if (lastUsername.toLowerCase() === 'user') {
+          pInput.value = 'User@12345';
+        } else {
+          pInput.value = '';
+          pInput.focus();
+        }
+
+        uInput.classList.add('highlight-pulse');
+        setTimeout(() => uInput.classList.remove('highlight-pulse'), 400);
+        document.getElementById('submitBtn').focus();
+      }
+    }
+
     function applyCreds(username, password, cardElem) {
       const uInput = document.getElementById('usernameInput');
       const pInput = document.getElementById('passwordInput');
       
       uInput.value = username;
       pInput.value = password;
+      
+      localStorage.setItem(STORAGE_KEY_LAST_USER, username);
       
       document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active-demo-card'));
       if (cardElem) cardElem.classList.add('active-demo-card');

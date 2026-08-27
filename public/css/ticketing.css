@@ -320,6 +320,53 @@ body { background: #f4f6f9; color: #243447; font-family: 'Plus Jakarta Sans', -a
   font-size: 16px;
 }
 
+/* Last User Badge */
+.last-user-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
+.last-user-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #0369a1;
+}
+.last-user-left i {
+  color: #0284c7;
+}
+.last-user-left strong {
+  color: #0c4a6e;
+  font-weight: 700;
+}
+.btn-use-last {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-use-last:hover {
+  background: #0369a1;
+}
+
+.pass-masked {
+  letter-spacing: 2.5px;
+  color: #64748b !important;
+  font-weight: 800 !important;
+  user-select: none;
+}
+
 .auth-form {
   margin-bottom: 18px;
 }
