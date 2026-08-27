@@ -184,15 +184,28 @@ body {
   padding-bottom: 36px;
 }
 .content-header {
-  padding: 20px 0 14px;
+  padding: 22px 0 16px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 22px;
 }
 .content-header h1 {
-  margin-top: 0;
+  margin: 0;
+  font-size: 22px;
   font-weight: 800;
   color: #0f172a;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .content-header h1 small {
+  font-size: 13.5px;
   color: #64748b;
+  font-weight: 500;
+  display: inline-block;
+}
+.breadcrumb, .content-header > .breadcrumb {
+  display: none !important;
 }
 .ticket-welcome { padding: 28px 30px; background: #17324d; color: #fff; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(23, 50, 77, 0.15); }
 .ticket-welcome h1 { color: #fff; margin: 0 0 8px; font-size: 26px; font-weight: 700; }
