@@ -358,7 +358,7 @@ router.post('/tickets', (req, res, next) => {
 
 router.get('/tickets/:id', (req, res) => {
   const ticket = store.find(req.params.id);
-  if (!ticket) return res.status(404).render('main/notfound');
+  if (!ticket) return res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' });
 
   const currentUser = req.session.user;
   if (!store.canAccess(ticket, currentUser)) {
@@ -388,7 +388,7 @@ router.post('/tickets/:id/update', (req, res, next) => {
   });
 }, (req, res) => {
   const existingTicket = store.find(req.params.id);
-  if (!existingTicket) return res.status(404).render('main/notfound');
+  if (!existingTicket) return res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' });
 
   const currentUser = req.session.user;
   if (!store.canAccess(existingTicket, currentUser)) {
@@ -402,7 +402,7 @@ router.post('/tickets/:id/update', (req, res, next) => {
     : {};
 
   const ticket = store.update(req.params.id, updatePayload);
-  if (!ticket) return res.status(404).render('main/notfound');
+  if (!ticket) return res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' });
 
   if (req.body.noteText && req.body.noteText.trim()) {
     const authorName = currentUser.role === 'admin'
@@ -426,7 +426,7 @@ router.post('/tickets/:id/resolution-photo', (req, res, next) => {
   });
 }, (req, res) => {
   const existingTicket = store.find(req.params.id);
-  if (!existingTicket) return res.status(404).render('main/notfound');
+  if (!existingTicket) return res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' });
 
   const currentUser = req.session.user;
   if (!store.canAccess(existingTicket, currentUser) || currentUser.role !== 'admin') {
@@ -441,7 +441,7 @@ router.post('/tickets/:id/resolution-photo', (req, res, next) => {
 
 router.post('/tickets/:id/notes', (req, res) => {
   const existingTicket = store.find(req.params.id);
-  if (!existingTicket) return res.status(404).render('main/notfound');
+  if (!existingTicket) return res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' });
 
   const currentUser = req.session.user;
   if (!store.canAccess(existingTicket, currentUser)) {
@@ -456,6 +456,6 @@ router.post('/tickets/:id/notes', (req, res) => {
   res.redirect(`/tickets/${req.params.id}`);
 });
 
-router.use((req, res) => res.status(404).render('main/notfound'));
+router.use((req, res) => res.status(404).render('main/notfound', { title: 'Halaman Tidak Ditemukan' }));
 
 module.exports = router;

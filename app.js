@@ -17,6 +17,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/script-adminlte', express.static(path.join(__dirname, 'node_modules/admin-lte')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) => {
+  res.locals.title = 'Helpdesk Central';
   res.locals.currentPath = req.path;
   res.locals.currentUser = req.session.user || null;
   res.locals.flashMessage = req.flash('message')[0];
