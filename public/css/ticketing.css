@@ -72,6 +72,36 @@ body { background: #f4f6f9; color: #243447; font-family: 'Plus Jakarta Sans', -a
   .queue-number-box { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding-right: 0; padding-bottom: 12px; margin-right: 0; margin-bottom: 12px; }
 }
 
+/* Custom Profile & Form Note Box (High Contrast) */
+.note-box-info {
+  background: #f0f9ff !important;
+  border: 1px solid #bae6fd !important;
+  border-left: 5px solid #0284c7 !important;
+  border-radius: 8px !important;
+  padding: 14px 18px !important;
+  margin-bottom: 20px !important;
+}
+.note-box-info h4, .note-box-info h5 {
+  color: #0369a1 !important;
+  font-weight: 700 !important;
+  margin: 0 0 6px 0 !important;
+  font-size: 15px !important;
+}
+.note-box-info h4 i, .note-box-info h5 i {
+  color: #0284c7 !important;
+  margin-right: 6px !important;
+}
+.note-box-info p {
+  color: #1e293b !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+.note-box-info strong {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
 /* =========================================================
    PREMIUM MODERN SPLIT LOGIN PAGE
    ========================================================= */
